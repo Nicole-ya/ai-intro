@@ -68,6 +68,21 @@ html, body {
   background:#eef0fb; color:#5a6ec7; font-weight:500;
 }
 .card-arrow { flex-shrink:0; color:#c7c7cc; font-size:18px; font-weight:300; }
+/* 下载按钮 */
+.dl-btn {
+  display:flex; align-items:center; gap:12px;
+  background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color:#fff; border-radius:14px; padding:13px 16px;
+  margin:6px 0 14px; text-decoration:none;
+  box-shadow:0 3px 10px rgba(102,126,234,0.4);
+  -webkit-tap-highlight-color:transparent;
+}
+.dl-btn:active { transform:scale(0.98); }
+.dl-icon { font-size:24px; }
+.dl-text { flex:1; display:flex; flex-direction:column; gap:2px; }
+.dl-text strong { font-size:15px; }
+.dl-text small { font-size:11px; opacity:0.85; }
+.dl-arrow { font-size:18px; }
 .footer {
   text-align:center; font-size:11px; color:#9a9aa0;
   margin-top:18px; line-height:1.8;
@@ -90,6 +105,11 @@ html, body {
   <div class="sub">《人工智能：一种现代的方法》第 3 版（Russell &amp; Norvig）<br>每章含「复习笔记 + 思维导图」，点击卡片进入</div>
 </div>
 <div class="container">
+  <a class="dl-btn" href="AI%E5%AF%BC%E8%AE%BA%E5%A4%8D%E4%B9%A0.apk" download>
+    <span class="dl-icon">🤖</span>
+    <span class="dl-text"><strong>下载安卓 APP</strong><small>AI导论复习.apk · 17KB · 安装后桌面直接打开</small></span>
+    <span class="dl-arrow">⬇</span>
+  </a>
   <div class="section-title">📚 章节复习（共 8 章）</div>
 
   <a class="card c2" href="%E7%AC%AC%E4%BA%8C%E7%AB%A0%20-%20%E6%99%BA%E8%83%BD%E4%BD%93.html">
