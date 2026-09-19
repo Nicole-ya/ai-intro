@@ -85,7 +85,7 @@ html, body {
 <html lang=&quot;zh-CN&quot;>
 <head>
 <meta charset=&quot;UTF-8&quot;>
-<script>(function(){try{var b=document.createElement('base');b.href=parent.location.href.replace(/[^\/\]*$/,'');document.write('<base href=&quot;'+b.href+'&quot;>');}catch(e){}})();</script>
+<script>(function(){try{var b=document.createElement('base');b.href=parent.location.href.replace(/[^\/\\]*$/,'');document.write('<base href=&quot;'+b.href+'&quot;>');}catch(e){}})();</script>
 <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover&quot;>
 <meta name=&quot;apple-mobile-web-app-capable&quot; content=&quot;yes&quot;>
 <meta name=&quot;apple-mobile-web-app-status-bar-style&quot; content=&quot;default&quot;>
@@ -668,8 +668,6 @@ window.addEventListener('scroll', function() {
 <head>
 <meta charset=&quot;UTF-8&quot;>
 <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover&quot;>
-<meta name=&quot;apple-mobile-web-app-capable&quot; content=&quot;yes&quot;>
-<meta name=&quot;theme-color&quot; content=&quot;#1a365d&quot;>
 <title>第六章 约束满足问题 · 交互式思维导图</title>
 <script src=&quot;https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js&quot; onerror=&quot;window.echartsFailed=true&quot;></script>
 <style>
@@ -686,102 +684,139 @@ window.addEventListener('scroll', function() {
   --center: #1a365d;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
-html, body { height:100%; }
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
   background: var(--bg); color: var(--text);
-  display:flex; flex-direction:column; height:100%;
 }
-.toolbar {
-  display:flex; gap:8px; padding:8px 12px; background:var(--card);
-  border-bottom:1px solid var(--border); flex-shrink:0; flex-wrap:wrap;
+.main { margin-top:0px; padding:8px 10px 60px; }
+
+/* 工具条 */
+.toolbar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
+.toolbar-btn {
+  background:var(--card); border:1px solid var(--border); border-radius:6px;
+  padding:5px 12px; cursor:pointer; font-size:12px; color:var(--text);
+  transition:all 0.2s; min-height:30px;
 }
-.toolbar button {
-  border:1px solid var(--border); background:#fff; border-radius:6px;
-  padding:5px 12px; font-size:12.5px; cursor:pointer; color:var(--text);
-  -webkit-tap-highlight-color:transparent;
+.toolbar-btn:active { background:var(--c1l); color:var(--c1); }
+.toolbar .hint { font-size:11px; color:var(--text2); flex:1; min-width:200px; }
+
+/* 图表容器 */
+#chart {
+  width:100%; height:62vh; min-height:360px;
+  background:var(--card); border-radius:12px;
+  box-shadow:0 1px 3px rgba(0,0,0,0.06);
 }
-.toolbar button:active { background:var(--c1l); }
-#chart { flex:1; width:100%; min-height:200px; }
+#chartLoading {
+  display:flex; align-items:center; justify-content:center;
+  height:100%; font-size:13px; color:var(--text2);
+}
 #chartFallback {
-  display:none; flex:1; padding:24px; overflow:auto;
-  background:var(--card); margin:12px; border-radius:10px; border:1px solid var(--border);
+  display:none; padding:40px 20px; text-align:center;
+  font-size:13px; color:var(--text2); line-height:2;
+  background:var(--card); border-radius:12px;
 }
-#chartFallback h3 { font-size:15px; color:var(--center); margin-bottom:10px; }
-#chartFallback li { font-size:13px; margin:4px 0 4px 18px; line-height:1.7; }
-.legend {
-  display:flex; flex-wrap:wrap; gap:6px 14px; padding:8px 14px;
-  background:var(--card); border-top:1px solid var(--border);
-  font-size:11.5px; color:var(--text2); flex-shrink:0;
+
+/* 详情面板 */
+.info-panel {
+  position: fixed; top:0px; left:0; right:0; z-index:90;
+  background: var(--card); border-radius:0 0 12px 12px; padding:14px 16px;
+  border-left:4px solid var(--c1); border-bottom:1px solid var(--border);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  display: none; max-height:45vh; overflow-y:auto;
+  -webkit-overflow-scrolling: touch;
 }
-.legend .chip { display:inline-flex; align-items:center; gap:5px; }
-.legend .dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+.info-panel-overlay {
+  display: none; position: fixed; inset: 0; z-index: 89;
+  background: transparent;
+}
+.info-panel-overlay.show { display: block; }
+.info-panel.show { display: block; animation: slideDown 0.25s ease; }
+@keyframes slideDown { from { opacity:0; transform:translateY(-12px);} to {opacity:1; transform:translateY(0);} }
+.info-panel h3 { font-size:16px; color:var(--c1); margin-bottom:8px; }
+.info-panel p { font-size:14px; line-height:1.7; color:var(--text); }
+.info-panel .formula {
+  background:var(--c1l); padding:8px 12px; border-radius:6px;
+  font-family:monospace; font-size:13px; margin:8px 0; color:var(--c1);
+  overflow-x:auto;
+}
+.info-panel .close-btn {
+  float:right; background:none; border:none; font-size:18px; cursor:pointer;
+  color:var(--text2); padding:0 4px;
+}
+
+/* 数理逻辑推导链 */
 .logic-section {
-  background:var(--card); border-top:1px solid var(--border);
-  padding:10px 14px 14px; flex-shrink:0; max-height:34%; overflow:auto;
+  background: var(--card); border-radius: 12px; padding: 14px 16px;
+  margin-top: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
-.logic-section h3 { font-size:13.5px; color:var(--center); margin-bottom:8px; }
+.logic-section h3 {
+  font-size: 15px; color: var(--c1); margin-bottom: 12px;
+  padding-bottom: 8px; border-bottom: 2px solid var(--c1l);
+}
 .logic-chain {
-  display:flex; flex-wrap:wrap; align-items:center; gap:6px;
-  font-size:12px; margin-bottom:8px; line-height:1.6;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  margin-bottom: 10px; font-size: 13px;
 }
 .logic-chain .step {
-  background:var(--c1l); color:var(--center); border-radius:6px;
-  padding:3px 9px; font-weight:600;
+  background: var(--c1l); color: var(--c1); padding: 5px 10px;
+  border-radius: 6px; font-weight: 600;
 }
-.logic-chain .step.g { background:var(--c2l); color:var(--c2); }
-.logic-chain .step.o { background:var(--c3l); color:var(--c3); }
-.logic-chain .step.p { background:var(--c4l); color:var(--c4); }
-.logic-chain .arrow { color:var(--text2); }
-.info-overlay {
-  display:none; position:fixed; inset:0; z-index:89; background:transparent;
+.logic-chain .arrow { color: var(--text2); font-size: 14px; }
+.logic-chain .result {
+  background: var(--c2l); color: var(--c2); padding: 5px 10px;
+  border-radius: 6px; font-weight: 600;
 }
-.info-overlay.show { display:block; }
-.info-panel {
-  position:fixed; top:0; right:-380px; width:min(360px, 88vw); height:100%;
-  background:var(--card); box-shadow:-4px 0 18px rgba(0,0,0,0.15);
-  z-index:90; transition:right 0.28s ease; display:flex; flex-direction:column;
+
+/* 图例 */
+.legend {
+  display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;
+  margin-top: 12px; padding: 10px; background: var(--card);
+  border-radius: 10px; font-size: 12px; color: var(--text2);
 }
-.info-panel.show { right:0; }
-.info-head {
-  display:flex; align-items:center; justify-content:space-between;
-  padding:12px 16px; border-bottom:1px solid var(--border); background:var(--c1l);
-}
-.info-head .info-title { font-size:15px; font-weight:700; color:var(--center); }
-.info-head button {
-  border:none; background:rgba(0,0,0,0.06); width:28px; height:28px;
-  border-radius:50%; font-size:14px; cursor:pointer; color:var(--text);
-}
-.info-body { padding:14px 16px; overflow:auto; font-size:13px; line-height:1.8; }
-.info-body p { margin-bottom:8px; }
-.info-body strong { color:var(--center); }
-.node-nav-overlay {
-  display:none; position:fixed; inset:0; z-index:95; background:rgba(0,0,0,0.35);
-}
-.node-nav-overlay.show { display:block; }
+.legend-item { display: flex; align-items: center; gap: 5px; }
+.legend-dot { width: 12px; height: 12px; border-radius: 3px; }
+
+/* 节点目录 */
 .node-nav-panel {
-  position:fixed; top:0; left:-320px; width:min(300px, 84vw); height:100%;
-  background:var(--card); box-shadow:4px 0 18px rgba(0,0,0,0.15);
-  z-index:96; transition:left 0.28s ease; overflow-y:auto; padding-bottom:20px;
+  position: fixed; top:0; left:0; bottom:0; width:280px; max-width:80vw;
+  background: var(--card); z-index:200; box-shadow: 4px 0 16px rgba(0,0,0,0.15);
+  transform: translateX(-100%); transition: transform 0.3s ease;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
 }
-.node-nav-panel.show { left:0; }
-.node-nav-panel h3 {
-  font-size:14px; padding:14px 16px 8px; color:var(--center);
-  border-bottom:1px solid var(--border); margin-bottom:4px;
+.node-nav-panel.show { transform: translateX(0); }
+.node-nav-header {
+  padding: 14px 16px; background: var(--c1); color: #fff;
+  font-size: 15px; font-weight: 600; display: flex; justify-content: space-between; align-items: center;
 }
-.nav-branch {
-  padding:10px 16px 4px; font-size:12px; font-weight:700; color:var(--text2);
+.node-nav-close { background:none; border:none; color:#fff; font-size:20px; cursor:pointer; padding:0 4px; }
+.node-nav-list { padding: 8px 0; }
+.node-nav-group { margin-bottom: 4px; }
+.node-nav-branch {
+  padding: 10px 16px; font-size: 13px; font-weight: 600; color: var(--c1);
+  cursor: pointer; display: flex; align-items: center; gap: 6px;
+  min-height:36px;
 }
-.nav-leaf {
-  display:block; width:100%; text-align:left; border:none; background:none;
-  padding:9px 16px 9px 24px; font-size:13px; color:var(--text); cursor:pointer;
-  border-left:3px solid transparent;
+.node-nav-branch:active { background: var(--c1l); }
+.node-nav-children { padding-left: 24px; }
+.node-nav-child {
+  padding: 7px 16px 7px 12px; font-size: 12px; color: var(--text);
+  cursor: pointer; border-left: 2px solid var(--border);
+  min-height:36px; display:flex; align-items:center;
 }
-.nav-leaf:active { background:var(--c1l); }
-@media (max-width: 768px) {
-  .toolbar button { font-size:12px; padding:5px 10px; }
-  .logic-section { max-height:30%; }
-  .info-panel { width:min(340px, 92vw); }
+.node-nav-child:active { background: var(--c1l); color: var(--c1); }
+.node-nav-overlay {
+  position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.4);
+  z-index:150; display: none;
+}
+.node-nav-overlay.show { display: block; }
+
+@media (max-width: 600px) {
+  .main { padding: 6px 8px 50px; }
+  #chart { height: 56vh; min-height: 320px; }
+  .toolbar .hint { display:none; }
+  .node-nav-panel { width: 260px; }
+  .node-nav-branch { font-size: 12px; padding: 8px 14px; }
+  .node-nav-child { font-size: 12px; padding: 6px 14px 6px 10px; }
 }
 
 /* 推导链折叠 */
@@ -790,17 +825,27 @@ body {
 .logic-section.collapsed > *:not(h3){display:none !important;}
 .logic-section.collapsed h3{border-bottom:none !important;padding-bottom:0 !important;margin-bottom:0 !important;}
 .logic-section.collapsed .lg-arrow{transform:rotate(-90deg);}
+
+/* 推导链底栏化：收缩时固定底部一行，导图区域占满剩余空间 */
+html,body{height:100%;}
+body{display:flex;flex-direction:column;box-sizing:border-box;padding-bottom:52px;}
+body>.main{flex:1;display:flex;flex-direction:column;min-height:0;}
+#chart{flex:1 1 auto !important;height:auto !important;min-height:280px !important;}
+.logic-section{position:fixed;left:0;right:0;bottom:0;z-index:60;margin:0;border-radius:12px 12px 0 0;box-shadow:0 -2px 12px rgba(0,0,0,.14);max-height:48vh;overflow-y:auto;}
 </style>
 </head>
 <body>
-<div class=&quot;toolbar&quot;>
-  <button onclick=&quot;openNodeNav()&quot;>☰ 节点目录</button>
-  <button onclick=&quot;expandAll()&quot;>📂 展开全部</button>
-  <button onclick=&quot;collapseAll()&quot;>📁 折叠到分支</button>
-  <button onclick=&quot;toggleLayout()&quot;>🔄 切换布局</button>
-</div>
-<div id=&quot;chart&quot;></div>
-<div id=&quot;chartFallback&quot;>
+
+<div class=&quot;main&quot;>
+
+  <div class=&quot;toolbar&quot;>
+    <button class=&quot;toolbar-btn&quot; id=&quot;layoutBtn&quot; onclick=&quot;toggleLayout()&quot;>⇄ 切换横向</button>
+    <button class=&quot;toolbar-btn&quot; onclick=&quot;resetView()&quot;>⌂ 重置视图</button>
+    <span class=&quot;hint&quot;>💡 点击节点查看详情 · 点击有子节点的节点就地展开/收起 · 支持缩放与拖动</span>
+  </div>
+
+  <div id=&quot;chart&quot;><div id=&quot;chartLoading&quot;>正在加载图表引擎…（首次需联网加载 ECharts）</div></div>
+  <div id=&quot;chartFallback&quot;>
   <h3>思维导图加载失败（ECharts CDN 不可用），以下是本章知识骨架：</h3>
   <ul>
     <li><strong>6.1 问题定义</strong>：三要素X/D/C、相容/完整/部分赋值、约束分类、约束图、地图着色/N皇后/数独</li>
@@ -809,41 +854,59 @@ body {
     <li><strong>6.4-6.5 局部搜索与问题结构</strong>：最小冲突、独立子问题、树结构CSP、割集调节、树分解</li>
   </ul>
 </div>
-<div class=&quot;logic-section collapsed&quot;><h3 onclick=&quot;this.parentElement.classList.toggle('collapsed')&quot;>🔗 数理逻辑推导链<span class=&quot;lg-arrow&quot;>▼</span></h3>
-  <div class=&quot;logic-chain&quot;>
+
+  <!-- 数理逻辑推导链 -->
+  <div class=&quot;logic-section collapsed&quot;><h3 onclick=&quot;this.parentElement.classList.toggle('collapsed')&quot;>📐 核心逻辑推导链<span class=&quot;lg-arrow&quot;>▼</span></h3>
+<div class=&quot;logic-chain&quot;>
     <span class=&quot;step&quot;>变量+值域+约束</span><span class=&quot;arrow&quot;>→</span>
     <span class=&quot;step&quot;>约束图</span><span class=&quot;arrow&quot;>→</span>
     <span class=&quot;step g&quot;>弧相容 AC-3 压缩值域</span><span class=&quot;arrow&quot;>→</span>
     <span class=&quot;step o&quot;>回溯搜索逐层赋值</span><span class=&quot;arrow&quot;>→</span>
     <span class=&quot;step&quot;>相容且完整 = 解</span>
-  </div>
-  <div class=&quot;logic-chain&quot;>
+  </div><div class=&quot;logic-chain&quot;>
     <span class=&quot;step o&quot;>MRV 选变量</span><span class=&quot;arrow&quot;>×</span>
     <span class=&quot;step o&quot;>LCV 选值</span><span class=&quot;arrow&quot;>×</span>
     <span class=&quot;step o&quot;>前向检验/MAC 早检失败</span><span class=&quot;arrow&quot;>⇒</span>
     <span class=&quot;step&quot;>高效回溯</span>
-  </div>
-  <div class=&quot;logic-chain&quot;>
+  </div><div class=&quot;logic-chain&quot;>
     <span class=&quot;step p&quot;>含环约束图</span><span class=&quot;arrow&quot;>→</span>
     <span class=&quot;step p&quot;>割集调节 / 树分解</span><span class=&quot;arrow&quot;>→</span>
     <span class=&quot;step p&quot;>树结构</span><span class=&quot;arrow&quot;>→</span>
     <span class=&quot;step&quot;>O(nd²) 拓扑求解免回溯</span>
   </div>
+  </div>
+
+  <!-- 图例 -->
+  <div class=&quot;legend&quot;>
+    <div class=&quot;legend-item&quot;><div class=&quot;legend-dot&quot; style=&quot;background:#2e5c8a&quot;></div>6.1 定义</div>
+    <div class=&quot;legend-item&quot;><div class=&quot;legend-dot&quot; style=&quot;background:#2d7a2d&quot;></div>6.2 传播</div>
+    <div class=&quot;legend-item&quot;><div class=&quot;legend-dot&quot; style=&quot;background:#9a6b00&quot;></div>6.3 回溯</div>
+    <div class=&quot;legend-item&quot;><div class=&quot;legend-dot&quot; style=&quot;background:#5b2c8a&quot;></div>6.4-6.5 结构</div>
+   <div class=&quot;legend-item&quot;>💡 滚轮/双指缩放 · 拖动平移</div>
+  </div>
+
 </div>
-<div class=&quot;legend&quot;>
-  <span class=&quot;chip&quot;><span class=&quot;dot&quot; style=&quot;background:var(--c1)&quot;></span>6.1 问题定义</span>
-  <span class=&quot;chip&quot;><span class=&quot;dot&quot; style=&quot;background:var(--c2)&quot;></span>6.2 约束传播</span>
-  <span class=&quot;chip&quot;><span class=&quot;dot&quot; style=&quot;background:var(--c3)&quot;></span>6.3 回溯搜索</span>
-  <span class=&quot;chip&quot;><span class=&quot;dot&quot; style=&quot;background:var(--c4)&quot;></span>6.4-6.5 局部搜索与结构</span>
-</div>
-<div class=&quot;info-overlay&quot; id=&quot;infoOverlay&quot; onclick=&quot;closeInfo()&quot;></div>
+
+<!-- 节点详情面板 -->
+<div class=&quot;info-panel-overlay&quot; id=&quot;infoPanelOverlay&quot; onclick=&quot;closeInfo()&quot;></div>
 <div class=&quot;info-panel&quot; id=&quot;infoPanel&quot;>
-  <div class=&quot;info-head&quot;><span class=&quot;info-title&quot; id=&quot;infoTitle&quot;>节点详情</span><button onclick=&quot;closeInfo()&quot;>✕</button></div>
-  <div class=&quot;info-body&quot; id=&quot;infoContent&quot;></div>
+  <button class=&quot;close-btn&quot; onclick=&quot;closeInfo()&quot;>×</button>
+  <h3 id=&quot;infoTitle&quot;></h3>
+  <div id=&quot;infoContent&quot;></div>
 </div>
+
+<!-- 节点目录 -->
 <div class=&quot;node-nav-overlay&quot; id=&quot;nodeNavOverlay&quot; onclick=&quot;closeNodeNav()&quot;></div>
-<div class=&quot;node-nav-panel&quot; id=&quot;nodeNavPanel&quot;><h3>🧠 节点目录</h3></div>
+<div class=&quot;node-nav-panel&quot; id=&quot;nodeNavPanel&quot;>
+  <div class=&quot;node-nav-header&quot;>
+    <span>🧠 思维导图目录</span>
+    <button class=&quot;node-nav-close&quot; onclick=&quot;closeNodeNav()&quot;>×</button>
+  </div>
+  <div class=&quot;node-nav-list&quot; id=&quot;nodeNavList&quot;></div>
+</div>
+
 <script>
+// ===== 知识点数据（由子代理生成） =====
 var BRANCH_META = [
   { key:'branch1', name:'6.1 问题定义', short:'6.1 定义', color:'#2e5c8a', light:'#e8f1fb',
     groups:[
@@ -906,117 +969,18 @@ var BRANCH_META = [
     ]}
 ];
 
-function leafNode(short, key, meta) {
-  return {
-    name: short, key: key,
-    itemStyle: { color: meta.color },
-    label: {
-      fontSize: 12, color: '#333',
-      backgroundColor: meta.light, borderColor: meta.color,
-      borderWidth: 1, borderRadius: 4, padding: [3, 6]
-    }
-  };
-}
-function subNode(name, meta) {
-  return {
-    name: name,
-    itemStyle: { color: meta.color, borderColor: meta.color },
-    label: { fontSize: 12, fontWeight: 600, color: meta.color }
-  };
-}
-
-var treeData = [{
-  name: '第六章 约束满足问题', key: 'center',
-  itemStyle: { color: '#1a365d' },
-  label: {
-    fontSize: 15, fontWeight: 700, color: '#fff',
-    backgroundColor: '#1a365d', borderRadius: 8, padding: [8, 14]
-  },
-  children: BRANCH_META.map(function(meta) {
-    return {
-      name: meta.name, key: meta.key, collapsed: false,
-      itemStyle: { color: meta.color },
-      label: {
-        fontSize: 13, fontWeight: 700, color: '#fff',
-        backgroundColor: meta.color, borderRadius: 6, padding: [5, 10]
-      },
-      children: meta.groups.map(function(g) {
-        var sn = subNode(g.name, meta);
-        sn.children = g.kids.map(function(k) { return leafNode(k.short, k.key, meta); });
-        return sn;
-      })
-    };
-  })
-}];
-
-var isMobile = window.innerWidth <= 768;
-var currentLayout = isMobile ? 'LR' : 'radial';
-var chart = null;
-
-function buildOption(layout) {
-  var radial = (layout === 'radial');
-  return {
-    tooltip: { show: false },
-    series: [{
-      type: 'tree',
-      data: treeData,
-      layout: layout,
-      orient: radial ? undefined : 'LR',
-      edgeForkPosition: '65%',
-      left: '10%', right: '24%', top: '12%', bottom: '12%',
-      symbol: 'circle',
-      symbolSize: 8,
-      roam: true,
-      expandAndCollapse: true,
-      initialTreeDepth: radial ? 2 : 3,
-      animationDuration: 400,
-      label: {
-        position: radial ? 'inside' : 'right',
-        verticalAlign: 'middle',
-        align: radial ? 'center' : 'left',
-        fontSize: isMobile ? 11 : 12
-      },
-      leaves: {
-        label: {
-          position: radial ? 'radial' : 'right',
-          align: radial ? 'center' : 'left',
-          fontSize: isMobile ? 11 : 12
-        }
-      },
-      lineStyle: { color: '#bbb', width: 1.5, curveness: radial ? 0 : 0.5 },
-      emphasis: { focus: 'descendant' }
-    }]
-  };
-}
-
-function tryInit() {
-  var el = document.getElementById('chart');
-  if (window.echartsFailed || typeof echarts === 'undefined') {
-    if (window.echartsFailed) {
-      el.style.display = 'none';
-      document.getElementById('chartFallback').style.display = 'block';
-    }
-    return;
-  }
-  if (el.offsetWidth === 0 || el.offsetHeight === 0) return;
-  if (chart) return;
-  chart = echarts.init(el);
-  chart.setOption(buildOption(currentLayout));
-  chart.on('click', function(params) {
-    if (params.data &amp;&amp; params.data.key) showInfo(params.data.key);
-  });
-  generateNodeNav();
-}
-var initTimer = setInterval(function() {
-  if (chart || window.echartsFailed) { clearInterval(initTimer); }
-  tryInit();
-}, 400);
-window.addEventListener('resize', function() { if (chart) chart.resize(); });
+var branchInfo = {
+  center: { title:'第六章 约束满足问题', content:'<p><strong>主线</strong>：定义三要素（X/D/C）→ 约束传播压缩值域（四级相容、AC-3）→ 回溯搜索枚举赋值（MRV/度/LCV、前向检验/MAC）→ 利用问题结构加速（独立子问题、树、割集、树分解）。</p><p>点击任意节点查看详情；点击分支节点可展开/折叠子树。</p>' },
+  branch1: { title:'6.1 约束满足问题的定义', content:'<p><strong>核心</strong>：CSP = {X, D, C} 三要素；解 = 相容且完整的赋值。</p><p><strong>约束分类</strong>：一元 / 二元 / 高阶 / 全局。<strong>约束图</strong>：结点=变量，边=约束。</p><p><strong>三大实例</strong>：地图着色、N皇后、数独。CSP 的结构化表示让算法与启发式通用化。</p><p>考试权重 ★★★★★（2024 期中数独建模 20 分）。</p>' },
+  branch2: { title:'6.2 约束传播', content:'<p><strong>核心</strong>：用约束减小变量合法取值范围并级联影响。</p><p><strong>相容阶梯</strong>：结点相容(1) → 弧相容(2) → 路径相容(3) → k-相容 / 强k-相容。</p><p><strong>AC-3</strong>：弧相容队列算法，O(cd³)；弧相容 ≠ 有解。</p><p>考试权重 ★★★★★（2018 期中弧相容压缩 25 分大题、研究生卷 AC-3 轨迹）。</p>' },
+  branch3: { title:'6.3 CSP 的回溯搜索', content:'<p><strong>核心</strong>：DFS + 每次赋一个变量 + 失败撤销；利用交换性每层一个变量。</p><p><strong>三大策略</strong>：MRV/度启发式选变量、LCV 选值、前向检验/MAC 早检失败；智能回溯用冲突集直接回跳根源。</p><p>口诀：变量选最可能失败的，值选最可能成功的。</p><p>考试权重 ★★★★。</p>' },
+  branch4: { title:'6.4-6.5 局部搜索与问题结构', content:'<p><strong>6.4</strong>：最小冲突启发式（完整赋值+减少冲突），课堂简提。</p><p><strong>6.5</strong>：独立子问题 O(dⁿ)→O(d^c·n/c)；树结构 CSP 拓扑求解 O(nd²)；割集调节（删环割集成树）；树分解（合并结点，四条件）。</p><p>考试权重 ★★★。</p>' }
+};
 
 var nodeInfo = {
   csp_x: { title:'变量集合 X', content:'<p><strong>X = {X1, X2, …, Xn}</strong>，问题中待确定的对象。</p><p>地图着色中 X = {WA, NT, Q, NSW, V, SA, T}；数独中每个空格是一个变量；N皇后中每行（列）的皇后位置是一个变量。</p>' },
   csp_d: { title:'值域集合 D', content:'<p><strong>D = {D1, …, Dn}</strong>，每个变量 Xi 有自己的值域 Di（Domain）。</p><p>地图着色 Di = {红, 绿, 蓝}；数独 Di = {1..9}。已填数字的格子值域是单元素集合。</p>' },
-  csp_c: { title:'约束集合 C', content:'<p><strong>C</strong>：描述变量取值的约束集合，每个约束是有序对 &lt;scope, rel&gt;。</p><p>地图着色：相邻区域不同色，如 SA≠WA；数独：27 个 Alldiff（9行+9列+9宫）。</p>' },
+  csp_c: { title:'约束集合 C', content:'<p><strong>C</strong>：描述变量取值的约束集合，每个约束是有序对 <scope, rel>。</p><p>地图着色：相邻区域不同色，如 SA≠WA；数独：27 个 Alldiff（9行+9列+9宫）。</p>' },
   consistent: { title:'相容的赋值', content:'<p><strong>不违反任何约束条件</strong>的赋值称为相容的（合法的）赋值。</p><p>例：WA=红、NT=绿 相容；WA=红、NT=红 不相容。</p>' },
   complete: { title:'完整赋值与解', content:'<p><strong>完整的赋值</strong>：每个变量都已被赋值。</p><p><strong>CSP 的解 = 相容的 + 完整的赋值</strong>，两个条件缺一不可。</p>' },
   partial: { title:'部分赋值', content:'<p><strong>部分赋值</strong>：只有部分变量被赋值，通常作为搜索的中间状态。</p><p>回溯搜索就是在部分赋值上逐步扩展，冲突时撤销。</p>' },
@@ -1027,7 +991,7 @@ var nodeInfo = {
   nqueen_sudoku: { title:'经典实例：N皇后与数独', content:'<p><strong>N皇后</strong>：变量=每行皇后所在列号 Qi∈{1..n}；约束=不同列、不在同一对角线 |i−j|≠|Qi−Qj|。</p><p><strong>数独</strong>：变量=每个空格；值域{1..9}；约束=每行/每列/每宫数字互不相同（2024 期中真题）。</p>' },
   structured: { title:'CSP 的优势：结构化表示', content:'<p>标准搜索的状态是黑盒；CSP 的状态被<strong>因子分解</strong>为变量+值域，结构可见。</p><p>好处：目标测试、后继函数、启发式都可以做成<strong>与问题无关的通用形式</strong>；赋值满足交换性，每层只考虑一个变量。</p>' },
   node_cons: { title:'结点相容（1-相容）', content:'<p>单个变量值域中<strong>所有取值满足它的一元约束</strong>，称该变量结点相容。</p><p>所有变量都结点相容 ⇒ 网络结点相容。达成方法：删掉违反一元约束的值。</p>' },
-  arc_cons: { title:'弧相容（2-相容）★', content:'<p>某变量值域中<strong>所有取值满足它的所有二元约束</strong>：对弧 (Xi,Xj)，Di 中每个值都在 Dj 中有支撑。</p><p>通用弧相容把概念推广到 n 元约束（例：Xi∈{0,1,2,3} 满足 X&lt;Y&lt;Z 需删去 2 和 3）。</p><p><strong>弧相容 ≠ 有解</strong>，AC-3 后通常仍需搜索。</p>' },
+  arc_cons: { title:'弧相容（2-相容）★', content:'<p>某变量值域中<strong>所有取值满足它的所有二元约束</strong>：对弧 (Xi,Xj)，Di 中每个值都在 Dj 中有支撑。</p><p>通用弧相容把概念推广到 n 元约束（例：Xi∈{0,1,2,3} 满足 X<Y<Z 需删去 2 和 3）。</p><p><strong>弧相容 ≠ 有解</strong>，AC-3 后通常仍需搜索。</p>' },
   path_cons: { title:'路径相容（3-相容）', content:'<p>{Xi, Xj} 对第三变量 Xm 相容：每个相容赋值 {Xi=a, Xj=b}，Xm 都有合适取值使 {Xi,Xm} 和 {Xm,Xj} 相容。</p><p>可用 <strong>PC-2</strong> 算法达成。</p>' },
   k_cons: { title:'k-相容 与 强k-相容', content:'<p><strong>k-相容</strong>：对任何 k−1 个变量的相容赋值，第 k 个变量总能取到与之前相容的值。</p><p>1-相容=结点相容，2-相容=弧相容，3-相容=路径相容。</p><p><strong>强k-相容</strong>：k 级一直到 1 级相容全成立；强 n-相容 ⇒ 无需搜索即可构造解。</p>' },
   ac3: { title:'AC-3 算法流程 ★', content:'<p>维护弧相容队列：①所有弧入队；②弹出 (Xi,Xj)，REVISE 使 Xi 对 Xj 弧相容；③Di 变空 → 失败；④Di 变小 → 所有 (Xk,Xi) 重新入队；⑤队列空 → 完成。</p><p>2017级研究生期末考过完整执行轨迹（按字母序入队）。</p>' },
@@ -1048,98 +1012,219 @@ var nodeInfo = {
   tree_decomp: { title:'树分解', content:'<p>把约束图<strong>合并为相关联的子问题（超结点）</strong>，分别求解再合并成树。</p><p>四条件：①每个变量至少出现在一个子问题；②每个约束至少出现在一个子问题；③变量若出现在两个子问题，则必出现在连接路径的所有子问题中；④约束同理。</p>' }
 };
 
-var branchInfo = {
-  center: { title:'第六章 约束满足问题', content:'<p><strong>主线</strong>：定义三要素（X/D/C）→ 约束传播压缩值域（四级相容、AC-3）→ 回溯搜索枚举赋值（MRV/度/LCV、前向检验/MAC）→ 利用问题结构加速（独立子问题、树、割集、树分解）。</p><p>点击任意节点查看详情；点击分支节点可展开/折叠子树。</p>' },
-  branch1: { title:'6.1 约束满足问题的定义', content:'<p><strong>核心</strong>：CSP = {X, D, C} 三要素；解 = 相容且完整的赋值。</p><p><strong>约束分类</strong>：一元 / 二元 / 高阶 / 全局。<strong>约束图</strong>：结点=变量，边=约束。</p><p><strong>三大实例</strong>：地图着色、N皇后、数独。CSP 的结构化表示让算法与启发式通用化。</p><p>考试权重 ★★★★★（2024 期中数独建模 20 分）。</p>' },
-  branch2: { title:'6.2 约束传播', content:'<p><strong>核心</strong>：用约束减小变量合法取值范围并级联影响。</p><p><strong>相容阶梯</strong>：结点相容(1) → 弧相容(2) → 路径相容(3) → k-相容 / 强k-相容。</p><p><strong>AC-3</strong>：弧相容队列算法，O(cd³)；弧相容 ≠ 有解。</p><p>考试权重 ★★★★★（2018 期中弧相容压缩 25 分大题、研究生卷 AC-3 轨迹）。</p>' },
-  branch3: { title:'6.3 CSP 的回溯搜索', content:'<p><strong>核心</strong>：DFS + 每次赋一个变量 + 失败撤销；利用交换性每层一个变量。</p><p><strong>三大策略</strong>：MRV/度启发式选变量、LCV 选值、前向检验/MAC 早检失败；智能回溯用冲突集直接回跳根源。</p><p>口诀：变量选最可能失败的，值选最可能成功的。</p><p>考试权重 ★★★★。</p>' },
-  branch4: { title:'6.4-6.5 局部搜索与问题结构', content:'<p><strong>6.4</strong>：最小冲突启发式（完整赋值+减少冲突），课堂简提。</p><p><strong>6.5</strong>：独立子问题 O(dⁿ)→O(d^c·n/c)；树结构 CSP 拓扑求解 O(nd²)；割集调节（删环割集成树）；树分解（合并结点，四条件）。</p><p>考试权重 ★★★。</p>' }
+function leafNode(short, key, meta) {
+  return { name: short, short: short, key: key,
+    itemStyle: { color: '#ffffff', borderColor: meta.color, borderWidth: 1.2 },
+    symbolSize: 7 };
+}
+
+function subNode(short, meta) {
+  return { name: short, short: short,
+    itemStyle: { color: meta.color }, symbolSize: 10,
+    label: { color: meta.color, fontWeight: 600 } };
+}
+
+var treeData = {
+  name: '第六章 约束满足问题', short: '第六章 约束满足问题', key: 'center',
+  symbolSize: 16, collapsed: false,
+  itemStyle: { color: '#1a365d' },
+  label: { color: '#1a365d', fontWeight: 700, fontSize: 14 },
+  children: BRANCH_META.map(function(meta) {
+    return {
+      name: meta.name, key: meta.key, collapsed: false,
+      itemStyle: { color: meta.color },
+      label: { color: meta.color, fontWeight: 700 },
+      children: meta.groups.map(function(g) {
+        var sn = subNode(g.name, meta);
+        sn.children = g.kids.map(function(k) { return leafNode(k.short, k.key, meta); });
+        return sn;
+      })
+    };
+  })
 };
 
+// ===== ECharts 树图 =====
+var isMobile = window.innerWidth < 600;
+var layout = isMobile ? 'LR' : 'radial';
+var chart = null;
+var chartDone = false;
+
+function buildOption() {
+  return {
+    animationDuration: 300,
+    animationDurationUpdate: 450,
+    series: [{
+      type: 'tree',
+      data: [treeData],
+      layout: layout,
+      left: '10%', right: '24%', top: '12%', bottom: '12%',
+      roam: true,
+      symbol: 'circle',
+      expandAndCollapse: true,
+      initialTreeDepth: -1,
+      label: {
+        position: layout === 'radial' ? 'radial' : 'right',
+        rotate: 0,
+        verticalAlign: 'middle',
+        align: layout === 'radial' ? undefined : 'left',
+        fontSize: isMobile ? 11 : 12,
+        color: '#444',
+        formatter: function(p) { return p.data.short || p.name; }
+      },
+      leaves: {
+        label: { position: 'right', fontSize: isMobile ? 11 : 12, color: '#555' }
+      },
+      edgeForkPosition: '65%',
+      lineStyle: { color: '#c8cdd4', width: 1.2, curveness: 0.5 },
+      emphasis: { itemStyle: { shadowBlur: 8, shadowColor: 'rgba(0,0,0,0.25)' } }
+    }]
+  };
+}
+
+function refresh() {
+  if (chart) chart.setOption({ series: [{ data: [treeData] }] });
+}
+
+function initChart() {
+  var el = document.getElementById('chart');
+  if (!window.echarts) {
+    el.style.display = 'none';
+    document.getElementById('chartFallback').style.display = 'block';
+    return;
+  }
+  chart = echarts.init(el);
+  chart.setOption(buildOption());
+  chart.on('click', function(p) {
+    var d = p.data;
+    if (d.children &amp;&amp; d.children.length) {
+      d.collapsed = !d.collapsed;
+      refresh();
+    }
+    if (d.key) showInfo(d.key);
+  });
+}
+
+function tryInit() {
+  if (chartDone) return;
+  var el = document.getElementById('chart');
+  if (el.offsetWidth === 0) return;
+  if (!window.echarts &amp;&amp; !window.echartsFailed) return;
+  chartDone = true;
+  initChart();
+}
+window.addEventListener('load', function() { setTimeout(tryInit, 60); });
+setInterval(tryInit, 400);
+window.addEventListener('resize', function() {
+  if (chart) chart.resize();
+});
+
+function toggleLayout() {
+  layout = layout === 'radial' ? 'LR' : 'radial';
+  document.getElementById('layoutBtn').textContent = layout === 'radial' ? '⇄ 切换横向' : '◉ 切换径向';
+  if (chart) chart.setOption(buildOption(), true);
+}
+function resetView() {
+  if (chart) chart.setOption(buildOption(), true);
+}
+
+// ===== 详情面板 =====
 function showInfo(key) {
   var info = nodeInfo[key] || branchInfo[key];
   if (!info) return;
   document.getElementById('infoTitle').textContent = info.title;
   document.getElementById('infoContent').innerHTML = info.content;
-  document.getElementById('infoOverlay').classList.add('show');
   document.getElementById('infoPanel').classList.add('show');
+  document.getElementById('infoPanelOverlay').classList.add('show');
 }
 function closeInfo() {
-  document.getElementById('infoOverlay').classList.remove('show');
   document.getElementById('infoPanel').classList.remove('show');
+  document.getElementById('infoPanelOverlay').classList.remove('show');
 }
 
-function setCollapsed(node, flag) {
+// ===== 展开/折叠 =====
+function setCollapsedDeep(node, collapsed) {
   if (node.children &amp;&amp; node.children.length) {
-    node.collapsed = flag;
-    node.children.forEach(function(c) { setCollapsed(c, flag); });
+    node.collapsed = collapsed;
+    node.children.forEach(function(c) { setCollapsedDeep(c, collapsed); });
   }
 }
 function expandAll() {
-  treeData.forEach(function(n) { setCollapsed(n, false); });
-  if (chart) chart.setOption({ series: [{ data: treeData }] });
+  setCollapsedDeep(treeData, false);
+  refresh();
 }
 function collapseAll() {
-  treeData.forEach(function(n) {
-    if (n.children) n.children.forEach(function(b) { setCollapsed(b, true); });
-  });
-  if (chart) chart.setOption({ series: [{ data: treeData }] });
-}
-function toggleLayout() {
-  currentLayout = (currentLayout === 'radial') ? 'LR' : 'radial';
-  if (chart) chart.setOption(buildOption(currentLayout), true);
+  treeData.collapsed = false;
+  treeData.children.forEach(function(b) { setCollapsedDeep(b, true); });
+  closeInfo();
+  refresh();
 }
 
-function findPath(key) {
-  var path = [];
-  function dfs(node) {
-    path.push(node);
-    if (node.key === key) return true;
-    if (node.children) {
-      for (var i = 0; i < node.children.length; i++) {
-        if (dfs(node.children[i])) return true;
-      }
-    }
-    path.pop();
-    return false;
-  }
-  for (var i = 0; i < treeData.length; i++) { if (dfs(treeData[i])) return path; }
-  return null;
-}
-function expandTo(key) {
-  var path = findPath(key);
-  if (!path) return;
-  path.forEach(function(n) { n.collapsed = false; });
-  if (chart) chart.setOption({ series: [{ data: treeData }] });
-  showInfo(key);
-}
-
-function generateNodeNav() {
-  var panel = document.getElementById('nodeNavPanel');
-  var html = '';
-  BRANCH_META.forEach(function(meta) {
-    html += '<div class=&quot;nav-branch&quot; style=&quot;color:' + meta.color + '&quot;>■ ' + meta.name + '</div>';
-    meta.groups.forEach(function(g) {
-      g.kids.forEach(function(k) {
-        html += '<button class=&quot;nav-leaf&quot; data-key=&quot;' + k.key + '&quot; onclick=&quot;navJump(this.dataset.key)&quot;>' + k.short + '</button>';
-      });
-    });
-  });
-  panel.innerHTML = '<h3>🧠 节点目录</h3>' + html;
-}
-function navJump(key) {
-  closeNodeNav();
-  expandTo(key);
-}
+// ===== 节点目录 =====
 function openNodeNav() {
   document.getElementById('nodeNavPanel').classList.add('show');
   document.getElementById('nodeNavOverlay').classList.add('show');
+  generateNodeNav();
 }
 function closeNodeNav() {
   document.getElementById('nodeNavPanel').classList.remove('show');
   document.getElementById('nodeNavOverlay').classList.remove('show');
 }
-tryInit();
+function findPath(nodes, key, path) {
+  for (var i = 0; i < nodes.length; i++) {
+    var n = nodes[i];
+    var p2 = path.concat([n]);
+    if (n.key === key) return p2;
+    if (n.children) {
+      var r = findPath(n.children, key, p2);
+      if (r) return r;
+    }
+  }
+  return null;
+}
+function expandTo(key) {
+  var path = findPath([treeData], key, []);
+  if (!path) return;
+  path.forEach(function(n) { n.collapsed = false; });
+  refresh();
+}
+function generateNodeNav() {
+  var list = document.getElementById('nodeNavList');
+  list.innerHTML = '';
+  var center = document.createElement('div');
+  center.className = 'node-nav-branch';
+  center.innerHTML = '⭐ 第六章 约束满足问题';
+  center.onclick = function() { closeNodeNav(); expandTo('center'); showInfo('center'); };
+  list.appendChild(center);
+  var icons = ['📖', '📘', '📗', '📙', '📕'];
+  treeData.children.forEach(function(branch, i) {
+    var group = document.createElement('div');
+    group.className = 'node-nav-group';
+    var title = document.createElement('div');
+    title.className = 'node-nav-branch';
+    title.innerHTML = icons[i] + ' ' + branch.name;
+    title.onclick = function() { closeNodeNav(); expandTo(branch.key); showInfo(branch.key); };
+    group.appendChild(title);
+    var container = document.createElement('div');
+    container.className = 'node-nav-children';
+    branch.children.forEach(function(sub) {
+      var label = document.createElement('div');
+      label.className = 'node-nav-child';
+      label.style.fontWeight = '600';
+      label.style.color = 'var(--text2)';
+      label.textContent = '· ' + (sub.short || sub.name);
+      container.appendChild(label);
+      sub.children.forEach(function(child) {
+        var item = document.createElement('div');
+        item.className = 'node-nav-child';
+        item.textContent = child.short || child.name;
+        item.onclick = function() { closeNodeNav(); expandTo(child.key); showInfo(child.key); };
+        container.appendChild(item);
+      });
+    });
+    group.appendChild(container);
+    list.appendChild(group);
+  });
+}
 </script>
 </body>
 </html>
