@@ -185,5 +185,10 @@ html, body {
     每章页面均为单文件，可离线打开
   </div>
 </div>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(function(){});
+}
+</script>
 </body>
 </html>
