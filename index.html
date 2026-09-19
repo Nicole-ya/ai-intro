@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>人工智能导论 · 复习总站</title>
+<meta name="description" content="《人工智能：一种现代的方法》第3版 章节复习网页总目录">
+<meta name="theme-color" content="#667eea">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AI导论复习">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body {
+  min-height:100%;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background:#f5f5f7;
+  color:#1d1d1f;
+}
+/* 顶部紫色横幅 */
+.hero {
+  background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color:#fff;
+  padding:calc(env(safe-area-inset-top) + 28px) 20px 26px;
+  text-align:center;
+  box-shadow:0 2px 12px rgba(102,126,234,0.35);
+}
+.hero-icon {
+  width:64px; height:64px; margin:0 auto 10px;
+  border-radius:16px; box-shadow:0 4px 14px rgba(0,0,0,0.25);
+  display:block;
+}
+.hero h1 { font-size:22px; font-weight:700; letter-spacing:1px; }
+.hero .sub { font-size:12px; opacity:0.88; margin-top:6px; line-height:1.6; }
+/* 章节卡片 */
+.container { max-width:760px; margin:0 auto; padding:16px 14px calc(env(safe-area-inset-bottom) + 24px); }
+.section-title {
+  font-size:13px; font-weight:600; color:#667eea;
+  margin:10px 4px 10px; letter-spacing:0.5px;
+}
+.card {
+  display:flex; align-items:center; gap:12px;
+  background:#fff; border-radius:14px; padding:14px 14px;
+  margin-bottom:10px; text-decoration:none; color:inherit;
+  box-shadow:0 1px 4px rgba(0,0,0,0.06);
+  transition:transform 0.15s ease, box-shadow 0.15s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.card:active { transform:scale(0.98); box-shadow:0 1px 2px rgba(0,0,0,0.08); }
+.card-icon {
+  flex-shrink:0; width:46px; height:46px; border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:22px; color:#fff;
+  background:linear-gradient(135deg, var(--c1), var(--c2));
+}
+.card-body { flex:1; min-width:0; }
+.card-chapter { font-size:11px; font-weight:600; color:var(--c1); margin-bottom:2px; }
+.card-title { font-size:15px; font-weight:600; line-height:1.35; }
+.card-desc { font-size:12px; color:#6e6e73; margin-top:3px; line-height:1.45; }
+.card-tags { margin-top:5px; display:flex; gap:5px; flex-wrap:wrap; }
+.tag {
+  font-size:10px; padding:1px 7px; border-radius:8px;
+  background:#eef0fb; color:#5a6ec7; font-weight:500;
+}
+.card-arrow { flex-shrink:0; color:#c7c7cc; font-size:18px; font-weight:300; }
+/* 下载按钮 */
+.dl-btn {
+  display:flex; align-items:center; gap:12px;
+  background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color:#fff; border-radius:14px; padding:13px 16px;
+  margin:6px 0 14px; text-decoration:none;
+  box-shadow:0 3px 10px rgba(102,126,234,0.4);
+  -webkit-tap-highlight-color:transparent;
+}
+.dl-btn:active { transform:scale(0.98); }
+.dl-icon { font-size:24px; }
+.dl-text { flex:1; display:flex; flex-direction:column; gap:2px; }
+.dl-text strong { font-size:15px; }
+.dl-text small { font-size:11px; opacity:0.85; }
+.dl-arrow { font-size:18px; }
+.footer {
+  text-align:center; font-size:11px; color:#9a9aa0;
+  margin-top:18px; line-height:1.8;
+}
+/* 每章配色 */
+.c2  { --c1:#667eea; --c2:#764ba2; }
+.c3  { --c1:#4a90d9; --c2:#357abd; }
+.c4  { --c1:#43a047; --c2:#2e7d32; }
+.c5  { --c1:#e57373; --c2:#c62828; }
+.c6  { --c1:#fb8c00; --c2:#ef6c00; }
+.c79 { --c1:#8e6cc9; --c2:#6a3fb5; }
+.c13 { --c1:#26a69a; --c2:#00796b; }
+.c18 { --c1:#ec407a; --c2:#ad1457; }
+</style>
+</head>
+<body>
+<div class="hero">
+  <img class="hero-icon" src="icon-192.png" alt="AI">
+  <h1>人工智能导论 · 复习总站</h1>
+  <div class="sub">《人工智能：一种现代的方法》第 3 版（Russell &amp; Norvig）<br>每章含「复习笔记 + 思维导图」，点击卡片进入</div>
+</div>
+<div class="container">
+  <a class="dl-btn" href="AI%E5%AF%BC%E8%AE%BA%E5%A4%8D%E4%B9%A0.apk" download>
+    <span class="dl-icon">🤖</span>
+    <span class="dl-text"><strong>下载安卓 APP</strong><small>AI导论复习.apk · 17KB · 安装后桌面直接打开</small></span>
+    <span class="dl-arrow">⬇</span>
+  </a>
+  <div class="section-title">📚 章节复习（共 8 章）</div>
+
+  <a class="card c2" href="%E7%AC%AC%E4%BA%8C%E7%AB%A0%20-%20%E6%99%BA%E8%83%BD%E4%BD%93.html">
+    <div class="card-icon">🤖</div>
+    <div class="card-body">
+      <div class="card-chapter">第二章</div>
+      <div class="card-title">智能体</div>
+      <div class="card-desc">Agent 概念、理性 Agent、PEAS 框架、任务环境属性</div>
+      <div class="card-tags"><span class="tag">复习笔记</span><span class="tag">思维导图</span></div>
+    </div>
+    <div class="card-arrow">›</div>
+  </a>
+
+  <a class="card c3" href="%E7%AC%AC%E4%B8%89%E7%AB%A0%20-%20%E9%80%9A%E8%BF%87%E6%90%9C%E7%B4%A2%E8%BF%9B%E8%A1%8C%E9%97%AE%E9%A2%98%E6%B1%82%E8%A7%A3.html">
+    <div class="card-icon">🔍</div>
+    <div class="card-body">
+      <div class="card-chapter">第三章</div>
+      <div class="card-title">通过搜索进行问题求解</div>
+      <div class="card-desc">无信息搜索、启发式搜索、A*、启发函数</div>
+      <div class="card-tags"><span class="tag">复习笔记</span><span class="tag">思维导图</span></div>
+    </div>
+    <div class="card-arrow">›</div>
+  </a>
+
+  <a class="card c4" href="%E7%AC%AC%E5%9B%9B%E7%AB%A0%20-%20%E8%B6%85%E8%B6%8A%E7%BB%8F%E5%85%B8%E6%90%9C%E7%B4%A2.html">
+    <div class="card-icon">🧗</div>
+    <div class="card-body">
+      <div class="card-chapter">第四章</div>
+      <div class="card-title">超越经典搜索</div>
+      <div class="card-desc">局部搜索、爬山法、模拟退火、遗传算法</div>
+      <div class="card-tags"><span class="tag">复习笔记</span><span class="tag">思维导图</span></div>
+    </div>
+    <div class="card-arrow">›</div>
+  </a>
+
+  <a class="card c5" href="%E7%AC%AC%E4%BA%94%E7%AB%A0%20-%20%E5%AF%B9%E6%8A%97%E6%90%9C%E7%B4%A2.html">
+    <div class="card-icon">♟️</div>
+    <div class="card-body">
+      <div class="card-chapter">第五章</div>
+      <div class="card-title">对抗搜索</div>
+      <div class="card-desc">博弈论、极小极大算法、α-β 剪枝</div>
+      <div class="card-tags"><span class="tag">复习笔记</span><span class="tag">思维导图</span></div>
+    </div>
+    <div class="card-arrow">›</div>
+  </a>
+
+  <a class="card c6" href="%E7%AC%AC%E5%85%AD%E7%AB%A0%20-%20%E7%BA%A6%E6%9D%9F%E6%BB%A1%E8%B6%B3%E9%97%AE%E9%A2%98.html">
+    <div class="card-icon">🧩</div>
+    <div class="card-body">
+      <div class="card-chapter">第六章</div>
+      <div class="card-title">约束满足问题</div>
+      <div class="card-desc">CSP 定义、回溯搜索、弧相容、问题结构</div>
+      <div class="card-tags"><span class="tag">复习笔记</span><span class="tag">思维导图</span></div>
+    </div>
+    <div class="card-arrow">›</div>
+  </a>
+
+  <a class="card c79" href="%E7%AC%AC%E4%B8%83%E8%87%B3%E4%B9%9D%E7%AB%A0%20-%20%E9%80%BB%E8%BE%91Agent.html">
+    <div class="card-icon">📐</div>
+    <div class="card-body">
+      <div class="card-chapter">第七至九章</div>
+      <div class="card-title">逻辑 Agent</div>
+      <div class="card-desc">知识库、命题逻辑、一阶逻辑、推理</div>
+      <div class="card-tags"><span class="tag">复习笔记</span><span class="tag">思维导图</span></div>
+    </div>
+    <div class="card-arrow">›</div>
+  </a>
+
+  <a class="card c13" href="%E7%AC%AC%E5%8D%81%E4%B8%89%E8%87%B3%E5%8D%81%E4%BA%94%E7%AB%A0%20-%20%E4%B8%8D%E7%A1%AE%E5%AE%9A%E6%80%A7%E6%8E%A8%E7%90%86.html">
+    <div class="card-icon">🎲</div>
+    <div class="card-body">
+      <div class="card-chapter">第十三至十五章</div>
+      <div class="card-title">不确定性推理</div>
+      <div class="card-desc">概率基础、贝叶斯网络、时序概率模型</div>
+      <div class="card-tags"><span class="tag">复习笔记</span><span class="tag">思维导图</span></div>
+    </div>
+    <div class="card-arrow">›</div>
+  </a>
+
+  <a class="card c18" href="%E7%AC%AC%E5%8D%81%E5%85%AB%E7%AB%A0%20-%20%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0%E4%B8%8E%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C.html">
+    <div class="card-icon">🧠</div>
+    <div class="card-body">
+      <div class="card-chapter">第十八章</div>
+      <div class="card-title">机器学习与神经网络</div>
+      <div class="card-desc">学习形式、决策树、神经网络与深度学习</div>
+      <div class="card-tags"><span class="tag">复习笔记</span><span class="tag">思维导图</span></div>
+    </div>
+    <div class="card-arrow">›</div>
+  </a>
+
+  <div class="footer">
+    HNU 人工智能（专业核心）· 章节复习资料<br>
+    每章页面均为单文件，可离线打开
+  </div>
+</div>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(function(){});
+}
+</script>
+</body>
+</html>

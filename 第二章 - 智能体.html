@@ -1,0 +1,1912 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>第二章 - 智能体</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body {
+  width:100%; height:100%; overflow:hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background:#f5f5f7;
+}
+.app-container {
+  display:flex; flex-direction:column; height:100vh; height:100dvh;
+}
+/* 紫色顶部栏 - 字体到浏览器顶端 */
+.topbar {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0px 10px; padding-top:env(safe-area-inset-top);
+  padding-bottom:2px;
+  background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color:#fff; flex-shrink:0; gap:6px;
+  box-shadow:0 1px 6px rgba(0,0,0,0.12);
+  min-height: calc(28px + env(safe-area-inset-top));
+}
+.topbar-btn {
+  background:rgba(255,255,255,0.15); border:none; color:#fff;
+  padding:4px 8px; border-radius:6px; font-size:12px; cursor:pointer;
+  display:flex; align-items:center; gap:3px; flex-shrink:0;
+  -webkit-tap-highlight-color:transparent; transition:background 0.2s;
+  min-height:24px;
+}
+.topbar-btn:active { background:rgba(255,255,255,0.3); }
+.topbar-title {
+  font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  flex:1; text-align:center;
+}
+.topbar-chapter {
+  font-size:10px; opacity:0.9; background:rgba(255,255,255,0.2);
+  padding:1px 5px; border-radius:6px; white-space:nowrap; flex-shrink:0;
+}
+/* 标签切换栏 */
+.tab-bar {
+  display:flex; background:#fff; flex-shrink:0;
+  border-bottom:1px solid #e5e7eb;
+  padding:0 6px;
+}
+.tab-btn {
+  flex:1; padding:6px 6px; border:none; background:transparent;
+  font-size:13px; font-weight:500; color:#6b7280; cursor:pointer;
+  position:relative; transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:5px;
+  -webkit-tap-highlight-color:transparent;
+}
+.tab-btn.active {
+  color:#667eea; font-weight:600;
+}
+.tab-btn.active::after {
+  content:''; position:absolute; bottom:0; left:25%; right:25%;
+  height:2px; background:linear-gradient(90deg, #667eea, #764ba2);
+  border-radius:2px 2px 0 0;
+}
+.tab-btn:active { background:#f3f4f6; }
+/* 内容区域 */
+.content-area {
+  flex:1; position:relative; overflow:hidden;
+}
+.tab-panel {
+  position:absolute; top:0; left:0; width:100%; height:100%;
+  display:none;
+}
+.tab-panel.active {
+  display:block;
+}
+.tab-panel iframe {
+  width:100%; height:100%; border:none; display:block;
+}
+@media (max-width:480px) {
+  .topbar { padding:0px 8px; padding-top:env(safe-area-inset-top); padding-bottom:1px; }
+  .topbar-title { font-size:13px; }
+  .topbar-btn { font-size:11px; padding:3px 6px; }
+  .tab-btn { font-size:12px; padding:5px 4px; }
+}
+</style>
+</head>
+<body>
+<div class="app-container">
+  <div class="topbar">
+    <button class="topbar-btn" onclick="location.href='index.html'" title="返回总目录">🏠 首页</button>
+    <button class="topbar-btn" onclick="openNav()" title="目录">☰ 目录</button>
+    <div class="topbar-title">
+      <span class="topbar-chapter">第二章</span> 智能体
+    </div>
+    <button class="topbar-btn" onclick="toggleExpand()" id="expandBtn" title="全部展开/折叠">📂 展开</button>
+  </div>
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('notes', this)">📚 复习笔记</button>
+    <button class="tab-btn" onclick="switchTab('mindmap', this)">🧠 思维导图</button>
+  </div>
+  <div class="content-area">
+    <div class="tab-panel active" id="panel-notes">
+      <iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;zh-CN&quot;>
+<head>
+<meta charset=&quot;UTF-8&quot;>
+<meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover&quot;>
+<meta name=&quot;apple-mobile-web-app-capable&quot; content=&quot;yes&quot;>
+<meta name=&quot;apple-mobile-web-app-status-bar-style&quot; content=&quot;default&quot;>
+<meta name=&quot;theme-color&quot; content=&quot;#2e5c8a&quot;>
+<title>第二章 智能体 · 交互式复习笔记</title>
+<style>
+:root {
+  --bg: #f8f9fa;
+  --card-bg: #ffffff;
+  --text: #1a1b1c;
+  --text-secondary: #6b7280;
+  --border: #e5e7eb;
+  --accent: #2e5c8a;
+  --accent-light: #e8f1fb;
+  --accent2: #52c41a;
+  --accent3: #faad14;
+  --accent4: #9254de;
+  --def-color: #8b0000;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08);
+  --sidebar-w: 260px;
+}
+[data-theme=&quot;dark&quot;] {
+  --bg: #1a1d23;
+  --card-bg: #252830;
+  --text: #e4e6eb;
+  --text-secondary: #9ca3af;
+  --border: #374151;
+  --accent: #6ba3d6;
+  --accent-light: #1e3a5f;
+  --shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, &quot;Segoe UI&quot;, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.7;
+  transition: background 0.3s, color 0.3s;
+}
+/* 进度条 */
+#progress-bar {
+  position: fixed; top:0; left:0; height:3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  width:0%; z-index:1000; transition: width 0.1s;
+}
+/* 顶部栏 */
+.topbar {
+  display: none !important; position: fixed; top:0; left:0; right:0; height:52px;
+  background: var(--card-bg); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 16px;
+  z-index: 100; box-shadow: var(--shadow);
+}
+.topbar-title {
+  font-size: 15px; font-weight: 700; color: var(--accent);
+  margin-left: 12px; flex:1;
+}
+.topbar-btn {
+  background: none; border: 1px solid var(--border); border-radius: 6px;
+  padding: 5px 10px; cursor: pointer; font-size: 13px; color: var(--text);
+  margin-left: 8px; transition: all 0.2s;
+}
+.topbar-btn:hover { background: var(--accent-light); }
+#menu-toggle { display: none; }
+/* 侧边栏 */
+.sidebar {
+  position: fixed; top:52px; left:0; bottom:0; width: var(--sidebar-w);
+  background: var(--card-bg); border-right: 1px solid var(--border);
+  overflow-y: auto; padding: 16px 0; z-index: 90;
+  transition: transform 0.3s;
+}
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.nav-item {
+  display: block; padding: 8px 20px; font-size: 13px;
+  color: var(--text-secondary); text-decoration: none; cursor: pointer;
+  border-left: 3px solid transparent; transition: all 0.2s;
+}
+.nav-item:hover { background: var(--accent-light); color: var(--accent); }
+.nav-item.active { border-left-color: var(--accent); color: var(--accent); font-weight: 600; background: var(--accent-light); }
+.nav-section-title {
+  padding: 12px 20px 6px; font-size: 11px; font-weight: 700;
+  color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px;
+}
+/* 主内容 */
+.main {
+  margin-left: var(--sidebar-w); margin-top: 0px;
+  padding: 6px 24px 60px; max-width: 960px;
+}
+/* 封面 */
+.cover {
+  text-align: center; padding: 18px 16px; margin-bottom: 14px;
+  background: linear-gradient(135deg, var(--accent-light), var(--card-bg));
+  border-radius: 16px; border: 1px solid var(--border);
+}
+.cover h1 { font-size: 24px; color: var(--accent); margin-bottom: 4px; }
+.cover .subtitle { font-size: 16px; color: var(--text-secondary); margin-bottom: 16px; }
+.cover .meta { font-size: 12px; color: var(--text-secondary); }
+/* 模块卡片 */
+.module-card {
+  background: var(--card-bg); border-radius: 12px; margin-bottom: 20px;
+  border: 1px solid var(--border); box-shadow: var(--shadow);
+  overflow: hidden; transition: box-shadow 0.2s;
+}
+.module-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+.module-header {
+  padding: 16px 20px; cursor: pointer; display: flex;
+  align-items: center; justify-content: space-between;
+  background: var(--card-bg); user-select: none;
+}
+.module-header:hover { background: var(--accent-light); }
+.module-header h2 {
+  font-size: 17px; font-weight: 700; color: var(--accent);
+  display: flex; align-items: center; gap: 10px;
+}
+.module-num {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 8px;
+  background: var(--accent); color: #fff; font-size: 13px; font-weight: 700;
+}
+.module-toggle {
+  font-size: 18px; color: var(--text-secondary); transition: transform 0.3s;
+  width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+}
+.module-card.collapsed .module-toggle { transform: rotate(-90deg); }
+.module-body {
+  padding: 0 20px 20px; display: block;
+}
+.module-card.collapsed .module-body { display: none; }
+/* 内容样式 */
+.module-body h3 {
+  font-size: 15px; font-weight: 700; color: var(--text);
+  margin: 20px 0 10px; padding-left: 10px;
+  border-left: 3px solid var(--accent);
+}
+.module-body h4 {
+  font-size: 13.5px; font-weight: 700; color: var(--accent);
+  margin: 16px 0 8px;
+}
+.module-body p {
+  font-size: 13.5px; margin-bottom: 8px; color: var(--text);
+}
+.module-body ul { margin: 8px 0 8px 20px; }
+.module-body li {
+  font-size: 13px; margin-bottom: 4px; color: var(--text);
+}
+.def-term {
+  color: var(--def-color); font-weight: 700; font-size: 13.5px;
+}
+/* 表格 */
+.table-wrap {
+  overflow-x: auto; margin: 12px 0; border-radius: 8px;
+  border: 1px solid var(--border);
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+}
+.table-wrap::after {
+  content: &quot;← 左右滑动查看完整表格 →&quot;;
+  display: block; text-align: center; font-size: 11px;
+  color: var(--text-secondary); padding: 6px;
+  background: var(--accent-light); border-top: 1px solid var(--border);
+}
+@media (min-width: 769px) {
+  .table-wrap::after { display: none; }
+}
+table {
+  width: 100%; border-collapse: collapse; font-size: 12px;
+  min-width: max-content;
+}
+th {
+  background: var(--accent-light); color: var(--accent);
+  font-weight: 700; padding: 8px 10px; text-align: left;
+  border-bottom: 2px solid var(--accent); white-space: nowrap;
+  position: sticky; top: 0; z-index: 1;
+}
+td {
+  padding: 7px 10px; border-bottom: 1px solid var(--border);
+  color: var(--text); vertical-align: top;
+  white-space: normal; word-break: break-word;
+}
+tr:hover td { background: var(--accent-light); }
+tr:last-child td { border-bottom: none; }
+/* 真题样式 */
+.exam-q {
+  background: var(--accent-light); border-radius: 8px; padding: 12px 16px;
+  margin: 12px 0; border-left: 4px solid var(--accent);
+}
+.exam-q .q-title { font-weight: 700; color: var(--accent); font-size: 13px; margin-bottom: 6px; }
+.exam-q .q-answer { font-size: 12.5px; color: var(--text); margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border); }
+.exam-q .q-answer::before { content: &quot;📝 参考答案：&quot;; font-weight: 700; color: var(--accent2); }
+/* 速记卡片 */
+.quick-card {
+  background: linear-gradient(135deg, #fff7e6, #fff);
+  border: 1px solid #faad14; border-radius: 10px; padding: 14px 18px;
+  margin: 10px 0;
+}
+[data-theme=&quot;dark&quot;] .quick-card { background: linear-gradient(135deg, #3d3520, #252830); }
+.quick-card li { font-size: 12.5px; margin-bottom: 3px; }
+/* 回到顶部 */
+#back-top {
+  position: fixed; bottom: 24px; right: 24px; width: 44px; height: 44px;
+  border-radius: 50%; background: var(--accent); color: #fff; border: none;
+  font-size: 18px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  display: none; z-index: 200; transition: transform 0.2s;
+}
+#back-top:hover { transform: translateY(-2px); }
+/* 响应式 - 手机端优化 */
+@media (max-width: 768px) {
+  body { line-height: 1.75; -webkit-tap-highlight-color: transparent; }
+  /* 侧边栏：宽度82%，带阴影，平滑动画 */
+  .sidebar {
+    transform: translateX(-100%);
+    width: 82%; max-width: 320px;
+    box-shadow: 2px 0 12px rgba(0,0,0,0.15);
+    top: 0; padding-top: env(safe-area-inset-top, 0);
+    z-index: 200;
+  }
+  .sidebar.open { transform: translateX(0); }
+  .nav-item { padding: 12px 20px; font-size: 15px; min-height: 44px; display: flex; align-items: center; }
+  .nav-section-title { padding: 16px 20px 8px; font-size: 12px; }
+  /* 主内容 */
+  .main { margin-left: 0; margin-top: 0; padding: 4px 12px 50px; max-width: 100%; }
+  /* 顶部栏 */
+  .topbar { height: 50px; padding: 0 10px; padding-top: env(safe-area-inset-top, 0); }
+  .topbar-title { font-size: 14px; margin-left: 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .topbar-btn { padding: 6px 8px; font-size: 12px; margin-left: 4px; min-height: 36px; min-width: 36px; }
+  #menu-toggle { display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  #expand-all, #collapse-all { display: none; }
+  /* 封面 */
+  .cover { padding: 14px 12px; margin-bottom: 10px; border-radius: 10px; }
+  .cover h1 { font-size: 18px; line-height: 1.3; }
+  .cover .subtitle { font-size: 14px; }
+  .cover .meta { font-size: 11px; }
+  /* 模块卡片 */
+  .module-card { margin-bottom: 14px; border-radius: 10px; }
+  .module-header { padding: 14px 14px; min-height: 52px; }
+  .module-header h2 { font-size: 15px; gap: 8px; }
+  .module-num { width: 26px; height: 26px; font-size: 12px; border-radius: 7px; }
+  .module-body { padding: 0 14px 16px; }
+  .module-body h3 { font-size: 15px; margin: 16px 0 8px; padding-left: 8px; }
+  .module-body h4 { font-size: 14px; margin: 12px 0 6px; }
+  .module-body p { font-size: 15px; margin-bottom: 8px; }
+  .module-body ul { margin: 6px 0 6px 18px; }
+  .module-body li { font-size: 14.5px; margin-bottom: 5px; line-height: 1.7; }
+  .def-term { font-size: 15px; }
+  /* 表格 */
+  table { font-size: 13px; }
+  th { padding: 10px 12px; font-size: 13px; }
+  td { padding: 9px 12px; font-size: 13px; }
+  /* 真题 */
+  .exam-q { padding: 12px 14px; margin: 10px 0; }
+  .exam-q .q-title { font-size: 14px; }
+  .exam-q .q-answer { font-size: 13.5px; line-height: 1.7; }
+  /* 回到顶部 */
+  #back-top { bottom: calc(24px + env(safe-area-inset-bottom, 0)); right: 16px; width: 46px; height: 46px; font-size: 20px; }
+  /* 遮罩 */
+  .overlay { top: 0; z-index: 150; }
+  /* 进度条 */
+  #progress-bar { height: 3px; }
+}
+/* 超小屏 */
+@media (max-width: 380px) {
+  .topbar-title { font-size: 13px; }
+  .module-header h2 { font-size: 14px; }
+  .cover h1 { font-size: 18px; }
+}
+/* 遮罩 */
+.overlay {
+  display: none; position: fixed; top:0px; left:0; right:0; bottom:0;
+  background: rgba(0,0,0,0.4); z-index: 80;
+}
+.overlay.show { display: block; }
+</style>
+</head>
+<body>
+<div id=&quot;progress-bar&quot;></div>
+
+<div class=&quot;topbar&quot;>
+  <button class=&quot;topbar-btn&quot; onclick=&quot;window.location.href='第二章 - 智能体.html'&quot; style=&quot;margin-right:2px;font-weight:600;&quot;>← 返回</button>
+  <button class=&quot;topbar-btn&quot; id=&quot;menu-toggle&quot;>☰</button>
+  <div class=&quot;topbar-title&quot;>第二章-智能体 · 完整版复习笔记</div>
+  <button class=&quot;topbar-btn&quot; id=&quot;expand-all&quot;>全部展开</button>
+  <button class=&quot;topbar-btn&quot; id=&quot;collapse-all&quot;>全部折叠</button>
+  <button class=&quot;topbar-btn&quot; id=&quot;theme-toggle&quot;>🌙</button>
+</div>
+<div class=&quot;overlay&quot; id=&quot;overlay&quot;></div>
+<div class=&quot;sidebar&quot; id=&quot;sidebar&quot;><div class=&quot;nav-section-title&quot;>📑 章节目录</div><a class=&quot;nav-item&quot; data-target=&quot;section-1&quot; onclick=&quot;scrollToSection('section-1')&quot;>1. 第二章 知识框架总览</a><a class=&quot;nav-item&quot; data-target=&quot;section-ch1&quot; onclick=&quot;scrollToSection('section-ch1')&quot;>2. 第1章 绪论要点</a><a class=&quot;nav-item&quot; data-target=&quot;section-2&quot; onclick=&quot;scrollToSection('section-2')&quot;>3. 模块一：Agent基本概念</a><a class=&quot;nav-item&quot; data-target=&quot;section-3&quot; onclick=&quot;scrollToSection('section-3')&quot;>4. 模块二：理性Agent（Rational Agent）</a><a class=&quot;nav-item&quot; data-target=&quot;section-4&quot; onclick=&quot;scrollToSection('section-4')&quot;>5. 模块三：任务环境与PEAS框架</a><a class=&quot;nav-item&quot; data-target=&quot;section-5&quot; onclick=&quot;scrollToSection('section-5')&quot;>6. 模块四：Agent结构与类型</a><a class=&quot;nav-item&quot; data-target=&quot;section-6&quot; onclick=&quot;scrollToSection('section-6')&quot;>7. 模块五：历年试卷考点归类与真题</a><a class=&quot;nav-item&quot; data-target=&quot;section-7&quot; onclick=&quot;scrollToSection('section-7')&quot;>8. 模块六：易混淆概念辨析</a><a class=&quot;nav-item&quot; data-target=&quot;section-8&quot; onclick=&quot;scrollToSection('section-8')&quot;>9. 模块七：考前一页速记清单</a><div class=&quot;nav-section-title&quot; style=&quot;margin-top:16px;&quot;>⚡ 快捷操作</div><a class=&quot;nav-item&quot; onclick=&quot;expandAll();closeSidebar();&quot;>📂 全部展开</a><a class=&quot;nav-item&quot; onclick=&quot;collapseAll();closeSidebar();&quot;>📁 全部折叠</a><a class=&quot;nav-item&quot; onclick=&quot;scrollToTop()&quot;>⬆️ 回到顶部</a></div><div class=&quot;main&quot;>
+<div class=&quot;cover&quot;>
+  <h1>《人工智能：一种现代的方法》（第3版）</h1>
+  <div class=&quot;subtitle&quot;>第二章 智能体（Intelligent Agents）</div>
+  <div class=&quot;meta&quot;>复习总结文档 · 考点归类 · 历年真题<br>教材：Russell &amp; Norvig</div>
+</div>
+<p>《人工智能：一种现代的方法》（第3版）</p><p>第二章 智能体（Intelligent Agents）</p><p>复习总结文档 · 考点归类 · 历年真题</p><p>教材：Russell &amp; Norvig《人工智能：一种现代的方法》第3版</p><div class=&quot;module-card&quot; id=&quot;section-1&quot;><div class=&quot;module-header&quot; onclick=&quot;toggleModule(this)&quot;><h2><span class=&quot;module-num&quot;>1</span>第二章 知识框架总览</h2><span class=&quot;module-toggle&quot;>▼</span></div><div class=&quot;module-body&quot;><p>本章围绕&quot;智能体（Agent）&quot;这一AI核心概念展开，从定义→理性标准→任务环境→Agent结构，层层递进。</p><h3>本章五大模块</h3><div class=&quot;table-wrap&quot;><table><thead><tr><th>模块</th><th>核心内容</th><th>对应教材小节</th><th>考试权重</th></tr></thead><tbody><tr><td>一、Agent基本概念</td><td>Agent定义、感知/行动、Agent函数vs程序、体系结构、表驱动Agent</td><td>2.1</td><td>★★★</td></tr><tr><td>二、理性Agent</td><td>理性定义、四要素、全知vs理性、信息收集、学习、自主性</td><td>2.2</td><td>★★★★</td></tr><tr><td>三、任务环境PEAS</td><td>PEAS框架、7大环境属性维度、表2.6典型环境分类</td><td>2.3</td><td>★★★★★</td></tr><tr><td>四、Agent结构与类型</td><td>四种基本Agent（简单反射/基于模型/基于目标/基于效用）、学习Agent四组件</td><td>2.4</td><td>★★★★★</td></tr><tr><td>五、考点与真题</td><td>历年试卷考点归类、名词解释、简答、综合应用真题</td><td>—</td><td>—</td></tr></tbody></table></div></div></div><div class=&quot;module-card&quot; id=&quot;section-ch1&quot;><div class=&quot;module-header&quot; onclick=&quot;toggleModule(this)&quot;><h2><span class=&quot;module-num&quot;>2</span>第1章 绪论要点</h2><span class=&quot;module-toggle&quot;>▼</span></div><div class=&quot;module-body&quot;><p>第1章回答&quot;什么是人工智能&quot;：给出AI的四种定义范式、图灵测试与发展简史，并确立全书立场——研究理性Agent。本章是第2章&quot;智能体&quot;的理论前奏。</p><h3>1.1 人工智能的四种定义（2×2框架，必考）</h3><p>教材用两个维度划分AI定义：<strong>思维过程与推理 vs 行为</strong>（关心内部机制还是外在表现）、<strong>类人 vs 理性</strong>（以人的逼真度为标准还是以理想的性能表现为标准）。交叉得到四种研究途径：</p><div class=&quot;table-wrap&quot;><table><thead><tr><th></th><th>类人（与人类比较）</th><th>理性（理想表现）</th></tr></thead><tbody><tr><td><strong>思维过程与推理</strong></td><td>像人一样思考<br>认知建模途径：先弄清人脑如何思维（内省/心理实验/脑成像），再把思维过程表达为计算机程序，与认知科学交叉</td><td>理性地思考<br>&quot;思维法则&quot;途径：源于亚里士多德三段论的逻辑学传统，用不可辩驳的推理规则指导思维</td></tr><tr><td><strong>行为</strong></td><td>像人一样行动<br>图灵测试途径：表现出的行为与人无法区分即可，不关心内部思维过程</td><td>理性地行动<br>理性Agent途径：为取得最佳期望结果而行动——<strong>本书采用的定义</strong></td></tr></tbody></table></div><p><span class=&quot;def-term&quot;>【理性Agent（合理地行动）】</span>能够实现最佳期望结果而行动的Agent。教材将人工智能定义为&quot;理性地行动&quot;，即研究理性Agent的构造，这是贯穿全书的立场。</p><p><span class=&quot;def-term&quot;>【认知建模（像人一样思考）】</span>必须有足够精确的人脑思维理论，才能把思维过程写成计算机程序，属认知科学方向。</p><p><span class=&quot;def-term&quot;>【&quot;思维法则&quot;途径（理性地思考）】</span>逻辑学传统：19世纪逻辑学家建立了关于智能行为的精确逻辑陈述，1965年出现原则上可用逻辑记号求解任何可叙述问题的程序；但&quot;知道正确推理&quot;不等于&quot;做出正确行动&quot;，且非所有智能行为都能用逻辑演绎表达。</p><p><span class=&quot;def-term&quot;>【理性地行动途径的优势】</span>比&quot;思维法则&quot;更一般（有时没有可证明正确的行动，但必须有所作为），比&quot;类人&quot;途径更便于科学评估（理性的标准清晰且通用）。</p><h3>1.2 图灵测试（Turing Test）</h3><p><span class=&quot;def-term&quot;>【图灵测试】</span>图灵1950年在《计算机器与智能》中提出：询问者通过文本提问，若无法区分回答者是人还是计算机，则称该计算机通过测试、具有智能。属于&quot;像人一样行动&quot;途径的测试标准。</p><p>通过<strong>完全图灵测试</strong>（Total Turing Test，另加视频信号与实物操作）所需的六项能力：</p><div class=&quot;table-wrap&quot;><table><thead><tr><th>能力</th><th>作用</th></tr></thead><tbody><tr><td>自然语言处理</td><td>用某种语言（如英语）成功交流</td></tr><tr><td>知识表示</td><td>存储已知的与感知到的信息</td></tr><tr><td>自动推理</td><td>运用存储的信息回答问题、推出新结论</td></tr><tr><td>机器学习</td><td>适应新情况，检测并外推模式</td></tr><tr><td>计算机视觉</td><td>感知物体（完全图灵测试新增）</td></tr><tr><td>机器人学</td><td>操纵对象并四处移动（完全图灵测试新增）</td></tr></tbody></table></div><p>注意：这六项能力恰好对应AI后续的主要分支学科；本书作者认为研究AI的基础原理比追求通过图灵测试本身更重要。</p><h3>1.3 人工智能发展简史（关键节点）</h3><div class=&quot;table-wrap&quot;><table><thead><tr><th>时期</th><th>关键事件</th><th>意义</th></tr></thead><tbody><tr><td>1943</td><td>McCulloch 与 Pitts 提出人工神经元模型</td><td>连接主义起点</td></tr><tr><td>1950</td><td>图灵发表《计算机器与智能》，提出图灵测试</td><td>首次系统论证&quot;机器能思考吗&quot;</td></tr><tr><td>1956</td><td>达特茅斯会议，McCarthy 正式命名&quot;人工智能&quot;</td><td>AI 学科诞生</td></tr><tr><td>1952-1969</td><td>早期热潮：通用问题求解器GPS、LISP语言(1958)、感知机、物理符号系统假说</td><td>乐观情绪高涨</td></tr><tr><td>1966-1973</td><td>机器翻译失败、Lighthill报告削减资助、1969年Minsky与Papert证明感知机局限</td><td>第一次AI寒冬</td></tr><tr><td>1969-1979</td><td>基于知识的专家系统兴起：DENDRAL(化学)、MYCIN(医疗)</td><td>知识工程时代</td></tr><tr><td>1980-1987</td><td>AI产业化；1986年反向传播算法重新流行</td><td>连接主义（神经网络）复兴</td></tr><tr><td>1987-1993</td><td>专家系统维护成本高、专用硬件泡沫破裂</td><td>第二次AI寒冬</td></tr><tr><td>1995-至今</td><td>智能Agent观点确立、互联网大数据兴起、2011年起深度学习爆发</td><td>数据驱动+算力推动AI全面落地</td></tr></tbody></table></div><h3>1.4 研究方法与主要流派</h3><div class=&quot;table-wrap&quot;><table><thead><tr><th>流派</th><th>对应定义途径</th><th>核心思想</th><th>代表</th></tr></thead><tbody><tr><td>符号主义（逻辑主义）</td><td>理性地思考</td><td>物理符号系统假说：符号操作即可产生智能，基于逻辑规则推理</td><td>GPS、专家系统</td></tr><tr><td>连接主义</td><td>像人一样思考</td><td>模拟大脑神经元连接，从数据中学习</td><td>感知机→反向传播→深度学习</td></tr><tr><td>行为主义（控制论）</td><td>像人一样行动</td><td>强调感知-行动闭环、与环境实时交互，源于Wiener控制论(1948)</td><td>控制论、强化学习</td></tr><tr><td>理性Agent（本书立场）</td><td>理性地行动</td><td>以&quot;取得最佳期望结果&quot;为统一标准，综合以上各派之长</td><td>本书全书主线</td></tr></tbody></table></div><h3>1.5 本章在全书中的地位</h3><ul><li><strong>智能Agent是贯穿全书的主题概念</strong>：本书以&quot;构造理性Agent&quot;为主线组织全部内容。</li></ul><ul><li>第1章确立&quot;理性地行动&quot;的AI定义立场 → 第2章正式定义Agent、理性Agent、任务环境与Agent结构。</li></ul><ul><li>后续各章（搜索、逻辑、概率、学习等）本质上都在回答同一个问题：如何让Agent更理性地行动。</li></ul><ul><li>衔接记忆：绪论中的&quot;理性Agent&quot;在第2章被精确化为——对每一个可能的感知序列，选择使性能度量期望值最大化的行动。</li></ul><h3>1.6 本章考试要点速记</h3><div class=&quot;quick-card&quot;><ul><li>四种定义2×2：思维/行为 × 类人/理性 → 认知建模、思维法则、图灵测试、理性Agent。</li></ul><ul><li>教材立场 = 理性地行动 = 理性Agent（能够实现最佳期望结果而行动的Agent）。</li></ul><ul><li>完全图灵测试六能力：自然语言处理、知识表示、自动推理、机器学习 + 计算机视觉、机器人学。</li></ul><ul><li>三个年份必背：1943神经元模型、1950图灵测试、1956达特茅斯会议（AI诞生）。</li></ul><ul><li>两次寒冬诱因：感知机局限被证明+机器翻译失败（第一次）；专家系统瓶颈（第二次）。</li></ul></div></div></div><div class=&quot;module-card&quot; id=&quot;section-2&quot;><div class=&quot;module-header&quot; onclick=&quot;toggleModule(this)&quot;><h2><span class=&quot;module-num&quot;>3</span>模块一：Agent基本概念</h2><span class=&quot;module-toggle&quot;>▼</span></div><div class=&quot;module-body&quot;><h3>1.1 核心名词定义（书上黑体字）</h3><p><span class=&quot;def-term&quot;>【Agent（智能体）】</span>任何能够通过传感器（sensors）感知环境，并通过执行器（actuators）作用于该环境的事物。即：感知环境 → 处理决策 → 执行行动。</p><p><span class=&quot;def-term&quot;>【传感器（Sensors）】</span>Agent用来感知环境的装置。如：摄像头、雷达、麦克风、键盘输入等。是Agent的&quot;输入器官&quot;。</p><p><span class=&quot;def-term&quot;>【执行器（Actuators）】</span>Agent用来对环境施加影响的装置。如：机械臂、轮子、显示屏、语音输出等。是Agent的&quot;输出器官&quot;。</p><p><span class=&quot;def-term&quot;>【感知（Percept）】</span>Agent在任一时刻通过传感器接收到的输入内容。</p><p><span class=&quot;def-term&quot;>【感知序列（Percept Sequence）】</span>Agent从开始运行到当前时刻所接收到的全部感知的完整历史。是Agent决策的全部信息依据。</p><p><span class=&quot;def-term&quot;>【Agent函数（Agent Function）】</span>一个抽象的数学映射：f: P* → A，将任意可能的感知序列映射为一个行动。是Agent行为的完整数学描述，理论上可以用一张大表表示。</p><p><span class=&quot;def-term&quot;>【Agent程序（Agent Program）】</span>Agent函数在物理硬件上的具体实现（代码）。程序每次调用时接收当前感知，返回一个行动。注意：程序输入是&quot;当前感知&quot;，而非完整感知序列；若需要历史信息，程序必须自己内部存储。</p><p><span class=&quot;def-term&quot;>【体系结构（Architecture）】</span>运行Agent程序的物理计算设备，提供传感器输入和执行器输出。公式：Agent = 体系结构（硬件） + Agent程序（软件）。</p><p><span class=&quot;def-term&quot;>【表驱动Agent（Table-driven Agent）】</span>一种理论上的Agent实现：预先构建一张巨大的查找表，记录每一条可能感知序列对应的行动，运行时直接查表输出行动。理论上可实现任意Agent函数，但实际完全不可行——感知序列数量指数爆炸，表格过大无法存储和编写，且无法学习。</p><h3>1.2 经典案例：两格真空吸尘器世界</h3><p>教材图2.2的经典教学环境，用于演示Agent函数：</p><ul><li>环境：只有两个格子 A 和 B</li></ul><ul><li>传感器：感知当前位置（A/B）+ 当前格子是否有灰尘（Dirty/Clean）</li></ul><ul><li>执行器：左移（Left）、右移（Right）、吸尘（Suck）、什么都不做（NoOp）</li></ul><ul><li>简单规则：当前格有灰 → 吸尘；当前格干净 → 移动到另一格</li></ul><p>Agent函数表（部分）：</p><div class=&quot;table-wrap&quot;><table><thead><tr><th>感知序列</th><th>输出行动</th></tr></thead><tbody><tr><td>[A, Clean]</td><td>Right（右移到B）</td></tr><tr><td>[A, Dirty]</td><td>Suck（吸尘）</td></tr><tr><td>[B, Clean]</td><td>Left（左移到A）</td></tr><tr><td>[B, Dirty]</td><td>Suck（吸尘）</td></tr><tr><td>[A, Clean], [A, Clean]</td><td>Right</td></tr><tr><td>[A, Clean], [A, Dirty]</td><td>Suck</td></tr></tbody></table></div><h3>1.3 重要区分：Agent函数 vs Agent程序</h3><div class=&quot;table-wrap&quot;><table><thead><tr><th>对比维度</th><th>Agent函数</th><th>Agent程序</th></tr></thead><tbody><tr><td>本质</td><td>抽象数学映射 f: P*→A</td><td>物理硬件上的具体代码实现</td></tr><tr><td>输入</td><td>完整感知序列（全部历史）</td><td>当前感知（单步）</td></tr><tr><td>输出</td><td>行动</td><td>行动</td></tr><tr><td>可实现性</td><td>理论存在，通常无穷大不可实现</td><td>实际可运行</td></tr><tr><td>关系</td><td>一个Agent函数可由多个不同程序实现</td><td>程序是函数的一种实现</td></tr></tbody></table></div></div></div><div class=&quot;module-card&quot; id=&quot;section-3&quot;><div class=&quot;module-header&quot; onclick=&quot;toggleModule(this)&quot;><h2><span class=&quot;module-num&quot;>4</span>模块二：理性Agent（Rational Agent）</h2><span class=&quot;module-toggle&quot;>▼</span></div><div class=&quot;module-body&quot;><h3>2.1 核心名词定义</h3><p><span class=&quot;def-term&quot;>【理性Agent（Rational Agent）】</span>对每一个可能的感知序列，根据已知感知序列提供的证据和Agent具有的先验知识，理性Agent应该选择能使其性能度量的期望值最大化的行动。核心公式：a* = arg max_a E[Performance | evidence]</p><p><span class=&quot;def-term&quot;>【性能度量（Performance Measure）】</span>评判Agent行为成功程度的客观标准。应基于&quot;结果&quot;而非&quot;行为过程&quot;。例如：吸尘器清洁的地板面积（结果），而非移动了多少步（过程）。</p><p><span class=&quot;def-term&quot;>【全知Agent（Omniscient Agent）】</span>能够预知行动的真实实际结果的Agent。全知是理想化概念，现实中不可能存在。理性 ≠ 全知：理性只基于当前可获得信息做最优期望决策，不需要预知未来。</p><p><span class=&quot;def-term&quot;>【信息收集（Information Gathering）】</span>理性Agent为了减少不确定性、改善未来决策，会主动采取行动获取更多环境信息。如：过马路前先左右观察。信息收集本身就是理性行动。</p><p><span class=&quot;def-term&quot;>【学习（Learning）】</span>Agent通过感知经验不断更新自身知识、改进行为的能力。学习使Agent能够从初始先验知识出发，逐渐适应未知环境。</p><p><span class=&quot;def-term&quot;>【自主性（Autonomy）】</span>Agent的行为由其自身从环境中感知和学习到的知识决定，而不是完全依赖设计者预先写入的先验知识。学习能力是获得自主性的关键。一个完全靠预设规则、不学习的Agent自主性差。</p><h3>2.2 理性依赖的四个要素（必考）</h3><p>判断一个行动是否理性，必须同时考虑以下四点：</p><div class=&quot;table-wrap&quot;><table><thead><tr><th>要素</th><th>含义</th><th>吸尘器示例</th></tr></thead><tbody><tr><td>① 性能度量</td><td>定义&quot;成功&quot;的标准（目标）</td><td>每清洁一格+1分，运行1000步</td></tr><tr><td>② 环境先验知识</td><td>Agent预先知道的环境信息</td><td>知道世界只有A、B两格，不知道灰尘在哪</td></tr><tr><td>③ 可执行行动</td><td>Agent能够采取的行为集合</td><td>左移、右移、吸尘、不动</td></tr><tr><td>④ 感知序列</td><td>到当前为止的全部感知历史</td><td>之前看到的位置和灰尘情况</td></tr></tbody></table></div><h3>2.3 理性 vs 全知 vs 完美（高频辨析）</h3><div class=&quot;table-wrap&quot;><table><thead><tr><th>概念</th><th>定义</th><th>现实性</th><th>关键区别</th></tr></thead><tbody><tr><td>理性（Rational）</td><td>基于可用信息，最大化期望性能</td><td>可实现</td><td>对&quot;决策过程&quot;最优，不保证结果</td></tr><tr><td>全知（Omniscient）</td><td>预知行动的真实实际结果</td><td>不可能</td><td>知道未来，绝对正确</td></tr><tr><td>完美（Perfect）</td><td>实际性能最大化</td><td>依赖运气</td><td>对&quot;结果&quot;最优，事后诸葛亮</td></tr></tbody></table></div><p>经典例子（教材原文）：</p><p>马路两边没有车，于是决定过马路。但过马路时天上意外掉下飞机舱门砸中行人。</p><ul><li>这次行动最终失败了，但&quot;过马路&quot;这个决定仍然是理性的——因为按照当时能看到的信息，过马路的预期收益最高。</li></ul><ul><li>理性只对&quot;当下掌握的信息&quot;负责，不需要预知意外。</li></ul><h3>2.4 学习与自主性的关系</h3><ul><li>不会学习的例子（教材原文）：蜣螂、泥蜂。行为是刻死的本能——哪怕人为挪走粪球/毛虫，虫子依然机械走完预设步骤，不会根据现实变化调整。</li></ul><ul><li>会学习的理性Agent：吸尘器跑久了，慢慢学会哪个区域更容易积灰，提前过去清扫。</li></ul><ul><li>自主性强 = 学习能力强 = 不依赖初始预设知识也能适应新环境。</li></ul></div></div><div class=&quot;module-card&quot; id=&quot;section-4&quot;><div class=&quot;module-header&quot; onclick=&quot;toggleModule(this)&quot;><h2><span class=&quot;module-num&quot;>5</span>模块三：任务环境与PEAS框架</h2><span class=&quot;module-toggle&quot;>▼</span></div><div class=&quot;module-body&quot;><h3>3.1 PEAS框架（必考）</h3><p><span class=&quot;def-term&quot;>【PEAS】</span>描述任务环境（Task Environment）的四要素框架，是设计Agent前的第一步。P=Performance（性能度量）、E=Environment（环境）、A=Actuators（执行器）、S=Sensors（传感器）。</p><p>PEAS各维度说明：</p><div class=&quot;table-wrap&quot;><table><thead><tr><th>字母</th><th>全称</th><th>含义</th><th>设计要点</th></tr></thead><tbody><tr><td>P</td><td>Performance Measure 性能度量</td><td>怎样算&quot;成功&quot;？评判标准</td><td>应基于结果而非过程；多目标需权衡</td></tr><tr><td>E</td><td>Environment 环境</td><td>Agent要打交道的世界是什么</td><td>包括物理环境和其他Agent</td></tr><tr><td>A</td><td>Actuators 执行器</td><td>Agent能执行什么动作</td><td>决定Agent的行动空间</td></tr><tr><td>S</td><td>Sensors 传感器</td><td>Agent能感知什么</td><td>决定Agent的信息获取能力</td></tr></tbody></table></div><h3>3.2 PEAS经典示例</h3><p>示例1：自动驾驶出租车（教材图2.4）</p><div class=&quot;table-wrap&quot;><table><thead><tr><th>维度</th><th>内容</th></tr></thead><tbody><tr><td>P 性能度量</td><td>安全、快速、合法、舒适、省油、利润最大化</td></tr><tr><td>E 环境</td><td>道路、其他车辆、行人、交通信号、天气（阿拉斯加下雪/加州无雪）</td></tr><tr><td>A 执行器</td><td>方向盘、油门、刹车、喇叭、显示屏、语音</td></tr><tr><td>S 传感器</td><td>摄像头、雷达、GPS、速度计、引擎传感器</td></tr></tbody></table></div><p>示例2：机器人足球运动员（2024年期中真题）</p><div class=&quot;table-wrap&quot;><table><thead><tr><th>维度</th><th>内容</th></tr></thead><tbody><tr><td>P 性能度量</td><td>进球数、控球率、传球成功率、失球数、比赛胜负</td></tr><tr><td>E 环境</td><td>足球场、足球、队友、对方球员、裁判、观众、场地条件</td></tr><tr><td>A 执行器</td><td>腿部（踢球/带球）、身体（移动/阻挡）、头部（顶球）、语音（沟通）</td></tr><tr><td>S 传感器</td><td>摄像头（视觉）、距离传感器、加速度计、陀螺仪、无线通信（接收队友信息）</td></tr></tbody></table></div><p>示例3：两格真空吸尘器</p><div class=&quot;table-wrap&quot;><table><thead><tr><th>维度</th><th>内容</th></tr></thead><tbody><tr><td>P 性能度量</td><td>清洁的格子数、运行时间、能耗</td></tr><tr><td>E 环境</td><td>两个格子A、B，灰尘随机分布</td></tr><tr><td>A 执行器</td><td>左移、右移、吸尘、不动</td></tr><tr><td>S 传感器</td><td>位置感知（A/B）、灰尘感知（Dirty/Clean）</td></tr></tbody></table></div><h3>3.3 任务环境的7大属性维度（考试核心）</h3><p>每个维度都是独立的，互不绑定，可以任意组合。</p><div class=&quot;table-wrap&quot;><table><thead><tr><th>属性维度</th><th>类型A</th><th>类型B</th><th>判断标准</th><th>典型例子</th></tr></thead><tbody><tr><td>① 可观察性</td><td>完全可观察
+Fully observable</td><td>部分可观察
+Partially observable</td><td>传感器能否拿到环境全部状态？</td><td>象棋（完全）vs 扑克（部分）</td></tr><tr><td>② 确定性</td><td>确定性
+Deterministic</td><td>随机性
+Stochastic</td><td>给定完整状态+全部动作，下一状态是否唯一？</td><td>象棋（确定）vs 双陆棋（随机）</td></tr><tr><td>③ 片段性</td><td>片段式
+Episodic</td><td>序贯式
+Sequential</td><td>当前行动是否影响未来状态？</td><td>零件质检（片段）vs 自动驾驶（序贯）</td></tr><tr><td>④ 动态性</td><td>静态
+Static</td><td>动态
+Dynamic
+（半动态Semi-dynamic）</td><td>Agent思考时环境是否自行变化？</td><td>填字游戏（静态）vs 自动驾驶（动态）</td></tr><tr><td>⑤ 离散性</td><td>离散
+Discrete</td><td>连续
+Continuous</td><td>状态/感知/行动是否只有有限个取值？</td><td>象棋（离散）vs 自动驾驶（连续）</td></tr><tr><td>⑥ Agent数量</td><td>单Agent
+Single-agent</td><td>多Agent
+Multi-agent</td><td>环境中是否有其他最大化自身性能的Agent？</td><td>数独（单）vs 象棋（多）</td></tr><tr><td>⑦ 知识完整性</td><td>已知
+Known</td><td>未知
+Unknown</td><td>Agent是否提前知道环境运行规则？</td><td>规则明确的游戏（已知）vs 探索新环境（未知）</td></tr></tbody></table></div><h3>3.4 各维度详解与易错点</h3><p>① 完全可观察 vs 部分可观察</p><ul><li>完全可观察：传感器每一时刻都能获取环境完整状态，Agent不需要维护内部记忆。</li></ul><ul><li>部分可观察：存在隐藏信息，Agent需要维护内部状态来推断看不见的部分。</li></ul><ul><li>易错：部分可观察 ≠ 环境随机。信息缺失和环境转移带概率是两回事。</li></ul><p>② 确定性 vs 随机性（最高频考点）</p><ul><li>确定性：给定当前完整环境状态 + 所有Agent的动作，下一状态唯一。</li></ul><ul><li>随机性：即使全部状态和动作已知，下一状态仍有多种可能（环境自带概率）。</li></ul><ul><li>关键：其他Agent的选择不算环境随机！象棋是多Agent+确定性环境。</li></ul><ul><li>教材特殊规则：部分可观察环境，从Agent视角通常当作随机（Stochastic）。扑克底层确定，但因隐藏信息，教材表2.6标为Stochastic。</li></ul><ul><li>真随机例子：西洋双陆棋掷骰子——环境本身产生随机数。</li></ul><p>③ 片段式 vs 序贯式</p><ul><li>片段式：每一步决策独立，当前动作不影响未来，不需要前瞻规划。</li></ul><ul><li>序贯式：当前行动改变未来所有状态，需要长期规划。</li></ul><p>④ 静态 vs 动态</p><ul><li>静态：Agent思考多久环境都不变，只有Agent行动才改变环境。</li></ul><ul><li>动态：Agent思考期间环境也随时间自动变化，犹豫就会错过时机。</li></ul><ul><li>半动态（Semi-dynamic）：环境本身不变，但Agent的思考计时会影响性能得分。如带时钟的国际象棋。</li></ul><p>⑤ 离散 vs 连续</p><ul><li>离散：状态、感知、行动只有有限个独立取值。</li></ul><ul><li>连续：状态/动作是连续数值（如速度、角度）。</li></ul><p>⑥ 单Agent vs 多Agent</p><ul><li>判断关键：环境中其他对象是否主动最大化自身性能度量。</li></ul><ul><li>风吹树叶是环境随机现象，不算Agent；下棋对手、路上其他汽车属于Agent。</li></ul><ul><li>多Agent环境可以是竞争（象棋）、合作（足球队友）或混合（自动驾驶）。</li></ul><p>⑦ 已知 vs 未知</p><ul><li>注意：这不是环境本身的固有属性，而是Agent的知识状态！</li></ul><ul><li>已知：Agent提前知道环境规则和行动后果。</li></ul><ul><li>未知：Agent一开始不知道规则，必须边运行边学习。</li></ul><ul><li>与可观察性独立：翻牌游戏规则已知但牌面看不到（已知+部分可观察）；全新游戏画面全可见但不知道按键功能（未知+完全可观察）。</li></ul><h3>3.5 教材表2.6：典型任务环境分类（必背）</h3><div class=&quot;table-wrap&quot;><table><thead><tr><th>任务环境</th><th>可观察性</th><th>Agent数</th><th>确定/随机</th><th>片段/序贯</th><th>静态/动态</th><th>离散/连续</th></tr></thead><tbody><tr><td>填字游戏 Crossword</td><td>完全</td><td>单</td><td>确定</td><td>序贯</td><td>静态</td><td>离散</td></tr><tr><td>带时钟象棋 Chess w/ clock</td><td>完全</td><td>多</td><td>确定</td><td>序贯</td><td>半动态</td><td>离散</td></tr><tr><td>扑克 Poker</td><td>部分</td><td>多</td><td>随机</td><td>序贯</td><td>静态</td><td>离散</td></tr><tr><td>西洋双陆棋 Backgammon</td><td>完全</td><td>多</td><td>随机</td><td>序贯</td><td>静态</td><td>离散</td></tr><tr><td>出租车驾驶 Taxi driving</td><td>部分</td><td>多</td><td>随机</td><td>序贯</td><td>动态</td><td>连续</td></tr><tr><td>医疗诊断 Medical diagnosis</td><td>部分</td><td>单</td><td>随机</td><td>序贯</td><td>动态</td><td>连续</td></tr><tr><td>图像分析 Image analysis</td><td>完全</td><td>单</td><td>确定</td><td>片段</td><td>静态</td><td>连续</td></tr><tr><td>零件分拣机器人 Part-picking</td><td>部分</td><td>单</td><td>随机</td><td>片段</td><td>动态</td><td>连续</td></tr><tr><td>炼油控制器 Refinery controller</td><td>部分</td><td>单</td><td>随机</td><td>序贯</td><td>动态</td><td>连续</td></tr><tr><td>互动英语家教 Interactive tutor</td><td>部分</td><td>多</td><td>随机</td><td>序贯</td><td>半动态</td><td>离散</td></tr></tbody></table></div><p>最难处理的环境组合（考试常问）：</p><p>部分可观察 + 多Agent + 随机 + 序贯式 + 动态 + 连续 + 未知。自动驾驶出租车是典型代表。</p></div></div><div class=&quot;module-card&quot; id=&quot;section-5&quot;><div class=&quot;module-header&quot; onclick=&quot;toggleModule(this)&quot;><h2><span class=&quot;module-num&quot;>6</span>模块四：Agent结构与类型</h2><span class=&quot;module-toggle&quot;>▼</span></div><div class=&quot;module-body&quot;><h3>4.1 Agent的基本结构</h3><p><span class=&quot;def-term&quot;>【Agent结构】</span>Agent = 体系结构（Architecture，硬件平台） + Agent程序（Agent Program，决策逻辑）。人工智能的工作就是设计Agent程序来实现Agent函数。</p><h3>4.2 四种基本Agent类型（考试重中之重）</h3><p>四种Agent按能力从弱到强排列：简单反射 → 基于模型 → 基于目标 → 基于效用。升级本质：内部表示越来越强，推理越来越深，应对复杂环境能力越来越强。</p><h4>① 简单反射Agent（Simple Reflex Agent）</h4><p><span class=&quot;def-term&quot;>【简单反射Agent】</span>仅根据当前感知（current percept）选择行动，基于条件-动作规则（condition-action rule，if-then），不维护任何内部状态，不记录感知历史。</p><ul><li>工作方式：感知当前状态 → 查规则表 → 执行对应行动</li></ul><ul><li>规则形式：if (condition) then action</li></ul><ul><li>优点：结构最简单、反应快、易于实现</li></ul><ul><li>重大局限（必考）：只能用于完全可观察环境；部分可观察环境下仅靠当前感知信息不足，很容易失效</li></ul><ul><li>例子：两格吸尘器（有灰吸尘，干净移动）；看到红灯就刹车；自动门禁系统</li></ul><ul><li>缺陷：单帧感知可能出错（如误识别刹车灯），没有历史信息校正</li></ul><h4>② 基于模型的反射Agent（Model-based Reflex Agent）</h4><p><span class=&quot;def-term&quot;>【基于模型的反射Agent】</span>维护内部状态（internal state）来追踪环境中不可直接观察的部分，依赖世界模型（world model）来预测环境如何变化以及行动会产生什么结果。能够处理部分可观察环境。</p><ul><li>核心组件1：内部状态（Internal State）——存储环境不可见部分的信息</li></ul><ul><li>核心组件2：世界模型（World Model）——描述&quot;世界如何工作&quot;</li></ul><ul><li>- 转移模型（Transition Model）：行动如何改变世界状态</li></ul><ul><li>- 传感器模型（Sensor Model）：世界状态如何产生感知</li></ul><ul><li>与简单反射的区别：多了&quot;记忆&quot;——能推断&quot;看不到但能推出来的东西&quot;</li></ul><ul><li>局限：只能回答&quot;现在世界状态是什么&quot;，不知道&quot;什么状态是好的&quot;</li></ul><ul><li>例子：自动驾驶汽车（维护对其他车辆位置的内部估计，即使被遮挡）</li></ul><h4>③ 基于目标的Agent（Goal-based Agent）</h4><p><span class=&quot;def-term&quot;>【基于目标的Agent】</span>在基于模型的基础上增加目标（goal）信息，能根据目标来规划行动序列。知道&quot;想要达到什么状态&quot;，在行动前考虑&quot;这个行动能否让我更接近目标&quot;，通过搜索（search）或规划（planning）来选择能达成目标的行动序列。</p><ul><li>与基于模型的区别：增加了&quot;目标&quot;维度，从&quot;知道现状&quot;升级为&quot;知道要往哪里走&quot;</li></ul><ul><li>优点：更灵活，目标改变即可适应新任务，不需要重写规则</li></ul><ul><li>局限：不区分目标的优先级，无法在多个冲突目标间做出权衡</li></ul><ul><li>例子：路径规划GPS导航（目标=到达目的地，搜索最优路线）；迷宫求解机器人</li></ul><h4>④ 基于效用的Agent（Utility-based Agent）</h4><p><span class=&quot;def-term&quot;>【基于效用的Agent】</span>使用效用函数（Utility Function）将状态映射为实数，表示该状态的&quot;合意程度&quot;（desirability）。选择最大化期望效用的行动，而不仅仅是&quot;达到目标&quot;。可以在多个目标之间做权衡，在冲突时选择最优折衷。</p><ul><li>核心机制：效用函数 U(s)——给每个状态打分</li></ul><ul><li>决策方式：选择最大化期望效用的行动</li></ul><ul><li>优势1：可以表达&quot;有些方案虽然都达到了目标，但优劣不同&quot;</li></ul><ul><li>优势2：可以在多个竞争性目标间权衡（如：安全但慢 vs 危险但快）</li></ul><ul><li>优势3：能在不确定性环境下做风险决策</li></ul><ul><li>局限：效用函数难以设计，需要准确反映真实偏好</li></ul><ul><li>例子：医疗诊断系统（在治疗效果、副作用、费用间权衡）；自动驾驶（安全、速度、舒适度权衡）</li></ul><h3>4.3 四种Agent对比总表（必背）</h3><div class=&quot;table-wrap&quot;><table><thead><tr><th>Agent类型</th><th>核心决策依据</th><th>内部状态</th><th>目标/效用</th><th>适用环境</th><th>典型例子</th><th>主要局限</th></tr></thead><tbody><tr><td>简单反射</td><td>当前感知 + if-then规则</td><td>无</td><td>无</td><td>完全可观察、规则简单</td><td>吸尘器、红灯刹车</td><td>无法处理部分可观察</td></tr><tr><td>基于模型反射</td><td>内部世界模型 + 当前感知</td><td>有（世界模型）</td><td>无</td><td>部分可观察</td><td>自动驾驶（跟踪被遮挡车辆）</td><td>不知道什么状态是好的</td></tr><tr><td>基于目标</td><td>目标状态 + 搜索规划</td><td>有</td><td>有目标</td><td>目标明确、路径复杂</td><td>GPS导航、迷宫机器人</td><td>无法权衡多个目标</td></tr><tr><td>基于效用</td><td>效用函数 + 期望最大化</td><td>有</td><td>有效用函数</td><td>多目标冲突、不确定性</td><td>医疗诊断、自动驾驶决策</td><td>效用函数难设计</td></tr></tbody></table></div><h3>4.4 学习Agent（Learning Agent）</h3><p><span class=&quot;def-term&quot;>【学习Agent】</span>能从经验中持续改进自身行为的Agent。包含四个核心组件：学习元件、性能元件、评判元件、问题产生器。</p><p>学习Agent四组件功能（2020年期中20分大题）：</p><div class=&quot;table-wrap&quot;><table><thead><tr><th>组件</th><th>英文</th><th>主要功能</th></tr></thead><tbody><tr><td>① 性能元件</td><td>Performance Element</td><td>接收感知，选择外部行动。即原来的Agent本身（前四类Agent都属于性能元件）。</td></tr><tr><td>② 学习元件</td><td>Learning Element</td><td>根据评判元件的反馈评价Agent做得如何，从而确定如何修改性能元件，改进行为。</td></tr><tr><td>③ 评判元件</td><td>Critic</td><td>根据固定的性能标准（Performance standard）告诉学习元件Agent的运转情况，提供反馈信号。</td></tr><tr><td>④ 问题产生器</td><td>Problem Generator</td><td>负责提议可以得到新的、有信息的经验的探索性行动，引导Agent尝试新事物，避免只做已知安全的动作。</td></tr></tbody></table></div><p>四组件协作流程：</p><ul><li>性能元件与环境交互（感知→行动）</li></ul><ul><li>评判元件根据性能标准评价性能元件的表现，给出反馈</li></ul><ul><li>学习元件根据反馈修改性能元件（改进规则/模型/效用函数）</li></ul><ul><li>问题产生器建议探索性行动，让性能元件获得新经验</li></ul><p>Agent可以学习改进的内容：</p><ul><li>条件-动作规则（反射组件）</li></ul><ul><li>转移模型和传感器模型（世界知识）</li></ul><ul><li>效用函数（偏好信息）</li></ul></div></div><div class=&quot;module-card&quot; id=&quot;section-6&quot;><div class=&quot;module-header&quot; onclick=&quot;toggleModule(this)&quot;><h2><span class=&quot;module-num&quot;>7</span>模块五：历年试卷考点归类与真题</h2><span class=&quot;module-toggle&quot;>▼</span></div><div class=&quot;module-body&quot;><h3>5.1 考点频次统计（2015-2024）</h3><div class=&quot;table-wrap&quot;><table><thead><tr><th>考点</th><th>出现年份</th><th>频次</th><th>题型</th><th>分值范围</th></tr></thead><tbody><tr><td>Agent定义</td><td>2017、2018、2019、2020、2024</td><td>5次</td><td>名词解释/简答</td><td>2-6分</td></tr><tr><td>理性Agent定义+理性vs完美</td><td>2017、2019</td><td>2次</td><td>简答</td><td>10分</td></tr><tr><td>Agent类型（7种）及原理</td><td>2018</td><td>1次</td><td>简答</td><td>10分</td></tr><tr><td>学习Agent模型+四组件功能</td><td>2020</td><td>1次</td><td>综合大题</td><td>20分</td></tr><tr><td>PEAS描述（含具体场景设计）</td><td>2015、2024</td><td>2次</td><td>综合应用</td><td>12-20分</td></tr><tr><td>任务环境属性判断</td><td>隐含在各题中</td><td>多次</td><td>选择/判断/简答</td><td>—</td></tr></tbody></table></div><h3>5.2 名词解释高频考点</h3><p>以下名词在历年试卷中反复出现，必须能准确背诵定义：</p><div class=&quot;table-wrap&quot;><table><thead><tr><th>序号</th><th>名词</th><th>考试出现</th><th>核心定义要点</th></tr></thead><tbody><tr><td>1</td><td>Agent（智能体）</td><td>2017/2018/2019/2020/2024</td><td>通过传感器感知环境+通过执行器作用于环境的实体</td></tr><tr><td>2</td><td>理性Agent</td><td>2017/2019</td><td>基于感知证据和先验知识，选择最大化性能度量期望值的行动</td></tr><tr><td>3</td><td>Agent函数</td><td>2018</td><td>抽象数学映射，感知序列→行动</td></tr><tr><td>4</td><td>Agent程序</td><td>2018</td><td>Agent函数在硬件上的具体代码实现</td></tr><tr><td>5</td><td>PEAS</td><td>2015/2024</td><td>性能度量+环境+执行器+传感器，任务环境描述框架</td></tr><tr><td>6</td><td>简单反射Agent</td><td>2018</td><td>仅根据当前感知+条件-动作规则行动，无内部状态</td></tr><tr><td>7</td><td>基于模型的Agent</td><td>2018</td><td>维护内部世界模型，处理部分可观察环境</td></tr><tr><td>8</td><td>基于目标的Agent</td><td>2018</td><td>根据显式目标，通过搜索规划选择行动</td></tr><tr><td>9</td><td>基于效用的Agent</td><td>2018</td><td>用效用函数评估状态，最大化期望效用，可多目标权衡</td></tr><tr><td>10</td><td>学习Agent</td><td>2018/2020</td><td>从经验中改进行为，含学习/性能/评判/问题产生器四组件</td></tr><tr><td>11</td><td>自主性</td><td>2018</td><td>行为取决于自身经验学习，而非仅靠初始预设</td></tr><tr><td>12</td><td>全知Agent</td><td>隐含考点</td><td>预知真实结果的理想化Agent，现实不存在</td></tr></tbody></table></div><h3>5.3 历年真题与参考答案</h3><div class=&quot;exam-q&quot;><div class=&quot;q-title&quot;>[2024 期中·综合题]（20分）</div><p>什么是Agent？一个Agent包含几个部分？设计一个机器人足球运动员Agent应该包含哪些组成部分，简述相关内容。</p><div class=&quot;q-answer&quot;>（a）Agent定义为响应来自环境的感知而采取行动的实体。（2分）
+（b）理性Agent为合理行动的Agent，Agent根据它所知道的做了&quot;正确的事情&quot;。（2分）
+（c）一个Agent包含4个部分：性能度量、环境、执行器、传感器（PEAS）。（4分）
+（d）机器人足球运动员PEAS描述（12分，每部分3分）：
+  P性能度量：进球数、控球率、传球成功率、比赛胜负等；
+  E环境：足球场、足球、队友、对方球员、裁判、场地条件；
+  A执行器：腿部（踢球/带球）、身体（移动/阻挡）、头部（顶球）；
+  S传感器：摄像头（视觉）、距离传感器、加速度计、无线通信等。</div></div><div class=&quot;exam-q&quot;><div class=&quot;q-title&quot;>[2020 期中·综合题]（20分）</div><p>什么是Agent？给出学习Agent的通用模型示意图，并说明学习Agent各组件的主要功能。</p><div class=&quot;q-answer&quot;>1）Agent定义为通过传感器感知环境并通过执行器采取行动对所处的环境产生影响的实体。（6分）
+2）学习Agent通用模型：包含性能元件、学习元件、评判元件、问题产生器四部分，与环境通过传感器和执行器交互。（6分）
+3）各组件功能：
+  （1）评判元件：根据固定的性能标准告诉学习元件Agent的运转情况；（2分）
+  （2）学习元件：根据评判元件的反馈评价Agent做得如何，从而确定如何修改性能元件；（2分）
+  （3）性能元件：接收感知，选择外部行动；（2分）
+  （4）问题产生器：负责可以得到新的和有信息的经验的行动提议。（2分）</div></div><div class=&quot;exam-q&quot;><div class=&quot;q-title&quot;>[2019 期中·简答题]（10分）</div><p>什么是Agent？什么是理性的Agent？理性的Agent一定能产生完美的结果吗？如果不能，为什么？</p><div class=&quot;q-answer&quot;>Agent定义为响应来自环境的感知而采取行动的实体。（3分）
+理性Agent为合理行动的Agent，Agent根据它所知道的做了&quot;正确的事情&quot;——即基于感知证据和先验知识，选择最大化性能度量期望值的行动。（3分）
+理性的Agent不一定能产生完美的结果。（1分）
+原因：Agent感知环境的信息特性有多种，有部分可观察的、不确定性的、动态的，这些都会导致采取的行动不是完美的。理性是使期望的性能最大化，而完美是使实际的性能最大化。（3分）</div></div><div class=&quot;exam-q&quot;><div class=&quot;q-title&quot;>[2017 期中·简答题]（10分）</div><p>什么是Agent？什么是理性的Agent？理性的Agent一定能产生完美的结果吗？如果不能，为什么？</p><div class=&quot;q-answer&quot;>Agent是能够行动的某些东西，就是可以感知环境并在环境中行动的事物。
+理性的Agent就是做事正确的Agent，对每一个可能的感知序列，根据已知的感知序列提供的证据和Agent具有的先验知识，理性的Agent应该选择能使其性能度量最大化的行动。
+不一定，因为同样的Agent在不同的环境下就会变成非理性的。理性是使期望的性能最大化，而完美是使实际的性能最大化。</div></div><div class=&quot;exam-q&quot;><div class=&quot;q-title&quot;>[2018 期中/期末·简答题]（10分）</div><p>什么是智能Agent？智能Agent有哪几种，简述其原理。</p><div class=&quot;q-answer&quot;>Agent：感知和行为的实体；可以被视为感知环境并采取行动的一个实体。
+智能Agent主要有以下几种：
+（1）反射Agent：其行为仅取决于当前感知的代理，基于条件-动作规则。
+（2）基于模型的Agent：行为直接来自当前世界状态的内部模型，并随时间更新，能处理部分可观察环境。
+（3）基于目标的Agent：选择其认为会实现明确表示的目标的Agent，通过搜索规划行动。
+（4）基于效用的Agent：选择它相信的操作将最大化结果状态的预期效用，可在多目标间权衡。
+（5）学习Agent：根据其经验，其行为随时间推移而改善的Agent，含学习元件、性能元件、评判元件、问题产生器。</div></div><div class=&quot;exam-q&quot;><div class=&quot;q-title&quot;>[2015 期中·简答题]（—分）</div><p>对于下列活动，分别给出任务环境的PEAS描述：（1）足球运动；（2）探索Titan的地下海洋。</p><div class=&quot;q-answer&quot;>（1）足球运动PEAS：
+  P：进球数、控球率、比赛胜负；
+  E：足球场、足球、队友、对方球员、裁判；
+  A：踢球、带球、传球、射门、跑动、身体对抗；
+  S：视觉（眼睛）、听觉、触觉、本体感觉。
+（2）探索Titan地下海洋PEAS：
+  P：探索覆盖率、数据采集量、发现新物种/地质特征数量、探测器存活时间；
+  E：Titan地下海洋（冰下液态水、高压、低温、黑暗、未知地形）；
+  A：推进器移动、机械臂采样、相机拍照、传感器探测、通信传输；
+  S：声呐、摄像头、温度传感器、压力传感器、化学传感器、GPS/惯性导航。</div></div><h3>5.4 判断题/选择题高频考点</h3><p>判断题（高频）：</p><div class=&quot;table-wrap&quot;><table><thead><tr><th>题号</th><th>题目</th><th>答案</th><th>解析</th></tr></thead><tbody><tr><td>1</td><td>国际象棋是随机环境，因为无法预测对手落子</td><td>×</td><td>对手是其他Agent，其选择不算环境随机。象棋是完全可观察+确定性环境。</td></tr><tr><td>2</td><td>部分可观察环境一定是随机环境</td><td>×</td><td>部分可观察=信息缺失；随机=环境转移带概率。二者独立。隔墙吸尘器是部分可观察+确定。</td></tr><tr><td>3</td><td>确定性环境意味着Agent一定能预测下一状态</td><td>×</td><td>只有同时完全可观察才能预测。部分可观察的确定环境，Agent依然预测不了。</td></tr><tr><td>4</td><td>理性Agent永远不会出错</td><td>×</td><td>理性只代表基于当下信息做最优选择，信息有局限时依然可能失败。</td></tr><tr><td>5</td><td>简单反射Agent可以处理部分可观察环境</td><td>×</td><td>简单反射仅靠当前感知，部分可观察环境信息不足，必须用基于模型的Agent。</td></tr><tr><td>6</td><td>Agent函数和Agent程序是同一个概念</td><td>×</td><td>函数是抽象数学映射（感知序列→行动）；程序是具体代码实现（输入当前感知）。</td></tr><tr><td>7</td><td>静态环境就是确定环境</td><td>×</td><td>二者独立维度。静态也可以随机（如双陆棋是静态+随机）。</td></tr><tr><td>8</td><td>多Agent环境一定是竞争关系</td><td>×</td><td>可以是合作（足球队友）、竞争（象棋）或混合（自动驾驶）。</td></tr><tr><td>9</td><td>基于效用的Agent比基于目标的Agent更强大</td><td>√</td><td>效用Agent能在多个目标间权衡，处理不确定性，目标Agent只能判断是否达到目标。</td></tr><tr><td>10</td><td>学习Agent的性能元件就是原来的Agent本身</td><td>√</td><td>性能元件负责接收感知、选择行动，即前四类Agent都属于性能元件。</td></tr></tbody></table></div><p>选择题（高频）：</p><div class=&quot;table-wrap&quot;><table><thead><tr><th>题号</th><th>题目</th><th>答案</th><th>解析</th></tr></thead><tbody><tr><td>1</td><td>智能体的核心定义是？A.能思考的程序 B.通过传感器感知环境并通过执行器执行动作的系统 C.能通过图灵测试的机器 D.具有人类智能的实体</td><td>B</td><td>教材原文定义：感知+行动</td></tr><tr><td>2</td><td>理性智能体的决策基础是？A.模仿人类 B.基于所有信息的完美决策 C.最大化性能度量的期望值 D.遵循预设规则</td><td>C</td><td>理性=最大化期望性能</td></tr><tr><td>3</td><td>简单反射型智能体的主要局限性是？A.决策太慢 B.无法处理部分可观察环境 C.需要大量计算 D.不能学习</td><td>B</td><td>仅靠当前感知，无内部状态</td></tr><tr><td>4</td><td>基于效用的智能体相比基于目标的主要优势是？A.决策更快 B.能处理多个竞争性目标 C.更容易编程 D.不需要环境模型</td><td>B</td><td>效用函数可多目标权衡</td></tr><tr><td>5</td><td>PEAS中E代表？A.执行器 B.环境 C.性能度量 D.传感器</td><td>B</td><td>Performance, Environment, Actuators, Sensors</td></tr><tr><td>6</td><td>下列哪个是完全可观察+确定性环境？A.扑克 B.自动驾驶 C.国际象棋 D.医疗诊断</td><td>C</td><td>象棋棋盘全可见，状态转移确定</td></tr><tr><td>7</td><td>学习Agent中，根据性能标准评价Agent表现的组件是？A.学习元件 B.性能元件 C.评判元件 D.问题产生器</td><td>C</td><td>Critic提供反馈</td></tr><tr><td>8</td><td>带时钟的国际象棋属于哪种动态性？A.静态 B.动态 C.半动态 D.不确定</td><td>C</td><td>环境不变但计时影响得分=半动态</td></tr></tbody></table></div></div></div><div class=&quot;module-card&quot; id=&quot;section-7&quot;><div class=&quot;module-header&quot; onclick=&quot;toggleModule(this)&quot;><h2><span class=&quot;module-num&quot;>8</span>模块六：易混淆概念辨析</h2><span class=&quot;module-toggle&quot;>▼</span></div><div class=&quot;module-body&quot;><h3>6.1 确定性 vs 完全可观察（最高频混淆）</h3><div class=&quot;table-wrap&quot;><table><thead><tr><th>维度</th><th>确定性（Deterministic）</th><th>完全可观察（Fully Observable）</th></tr></thead><tbody><tr><td>描述对象</td><td>环境的状态转移规则</td><td>Agent的感知能力</td></tr><tr><td>核心问题</td><td>给定状态+动作，下一状态是否唯一？</td><td>Agent能否看到环境全部状态？</td></tr><tr><td>关系</td><td>相互独立，可以任意组合</td><td>相互独立，可以任意组合</td></tr></tbody></table></div><p>四种组合：</p><ul><li>完全可观察 + 确定：国际象棋（全看得见，结果唯一）</li></ul><ul><li>完全可观察 + 随机：西洋双陆棋（全看得见，但掷骰子随机）</li></ul><ul><li>部分可观察 + 确定：隔墙吸尘器、扑克（底层确定，但有隐藏信息）</li></ul><ul><li>部分可观察 + 随机：部分观测的老虎机、自动驾驶</li></ul><h3>6.2 多Agent不确定性 vs 环境随机（Stochastic）</h3><div class=&quot;table-wrap&quot;><table><thead><tr><th>维度</th><th>多Agent不确定性</th><th>环境随机（Stochastic）</th></tr></thead><tbody><tr><td>来源</td><td>其他智能体的自主决策</td><td>环境自身的概率事件</td></tr><tr><td>环境属性</td><td>确定性环境</td><td>随机环境</td></tr><tr><td>例子</td><td>象棋：对手下一步选什么棋是对手Agent的决策，不是棋盘随机</td><td>双陆棋：掷骰子是环境随机事件</td></tr><tr><td>判断标准</td><td>所有Agent动作确定后，环境下一状态是否唯一</td><td>即使所有Agent动作固定，环境仍有多种可能</td></tr></tbody></table></div><h3>6.3 理性 vs 全知 vs 完美</h3><div class=&quot;table-wrap&quot;><table><thead><tr><th>维度</th><th>理性（Rational）</th><th>全知（Omniscient）</th><th>完美（Perfect）</th></tr></thead><tbody><tr><td>评判标准</td><td>决策过程最优（基于可用信息）</td><td>知道未来真实结果</td><td>实际结果最优</td></tr><tr><td>是否可实现</td><td>是</td><td>否（理想化）</td><td>依赖运气</td></tr><tr><td>是否保证好结果</td><td>否（信息不足时可能失败）</td><td>是</td><td>是（事后看）</td></tr><tr><td>例子</td><td>根据路况安全驾驶</td><td>预知所有事故并完美规避</td><td>事后看走了最快路线</td></tr></tbody></table></div><h3>6.4 已知/未知 vs 完全/部分可观察</h3><div class=&quot;table-wrap&quot;><table><thead><tr><th>维度</th><th>已知/未知（Known/Unknown）</th><th>完全/部分可观察（Observable）</th></tr></thead><tbody><tr><td>描述对象</td><td>Agent对环境规则的知识状态</td><td>Agent对环境状态的感知能力</td></tr><tr><td>核心问题</td><td>知不知道环境怎么运行？</td><td>看不看得见环境全部状态？</td></tr><tr><td>属性归属</td><td>不是环境固有属性，是Agent的知识状态</td><td>是环境与传感器关系的属性</td></tr><tr><td>组合例子</td><td>翻牌游戏：规则已知但牌面看不到（已知+部分可观察）</td><td>全新游戏：画面全可见但不知道按键功能（未知+完全可观察）</td></tr></tbody></table></div><h3>6.5 Agent函数 vs Agent程序</h3><div class=&quot;table-wrap&quot;><table><thead><tr><th>维度</th><th>Agent函数</th><th>Agent程序</th></tr></thead><tbody><tr><td>本质</td><td>抽象数学映射</td><td>物理硬件上的代码实现</td></tr><tr><td>输入</td><td>完整感知序列（全部历史）</td><td>当前感知（单步）</td></tr><tr><td>可实现性</td><td>通常无穷大，不可实际实现</td><td>可运行</td></tr><tr><td>关系</td><td>一个函数可由多个程序实现</td><td>程序是函数的一种实现</td></tr><tr><td>记忆</td><td>函数本身隐含全部历史</td><td>程序需要自己内部存储历史</td></tr></tbody></table></div><h3>6.6 静态 vs 动态 vs 半动态</h3><div class=&quot;table-wrap&quot;><table><thead><tr><th>类型</th><th>定义</th><th>例子</th></tr></thead><tbody><tr><td>静态（Static）</td><td>Agent思考时环境完全不变，只有Agent行动才改变环境</td><td>填字游戏、象棋（不带时钟）</td></tr><tr><td>动态（Dynamic）</td><td>Agent思考期间环境随时间自动变化</td><td>自动驾驶、实时交易</td></tr><tr><td>半动态（Semi-dynamic）</td><td>环境本身不变，但Agent的思考计时会影响性能得分</td><td>带时钟的国际象棋、限时考试</td></tr></tbody></table></div></div></div><div class=&quot;module-card&quot; id=&quot;section-8&quot;><div class=&quot;module-header&quot; onclick=&quot;toggleModule(this)&quot;><h2><span class=&quot;module-num&quot;>9</span>模块七：考前一页速记清单</h2><span class=&quot;module-toggle&quot;>▼</span></div><div class=&quot;module-body&quot;><h3>7.1 必背定义（12个）</h3><p>1. Agent：通过传感器感知环境、通过执行器作用于环境的实体。</p><p>2. 理性Agent：基于感知证据和先验知识，选择最大化性能度量期望值的行动。</p><p>3. 感知序列：Agent到当前为止的全部感知历史。</p><p>4. Agent函数：抽象数学映射，感知序列→行动。</p><p>5. Agent程序：Agent函数在硬件上的具体代码实现，输入为当前感知。</p><p>6. PEAS：性能度量(P)+环境(E)+执行器(A)+传感器(S)，任务环境描述框架。</p><p>7. 简单反射Agent：仅根据当前感知+条件-动作规则行动，无内部状态。</p><p>8. 基于模型的Agent：维护内部世界模型，处理部分可观察环境。</p><p>9. 基于目标的Agent：根据显式目标，通过搜索规划选择行动。</p><p>10. 基于效用的Agent：用效用函数评估状态，最大化期望效用，可多目标权衡。</p><p>11. 学习Agent：从经验中改进行为，含学习/性能/评判/问题产生器四组件。</p><p>12. 自主性：行为取决于自身经验学习，而非仅靠初始预设知识。</p><h3>7.2 必背公式/关系（5个）</h3><p>1. Agent = 体系结构（硬件） + Agent程序（软件）</p><p>2. 理性行动：a* = arg max_a E[Performance | evidence]</p><p>3. 理性依赖四要素：性能度量 + 先验知识 + 可执行行动 + 感知序列</p><p>4. Agent升级链：简单反射 → 基于模型 → 基于目标 → 基于效用 → 学习型</p><p>5. 最难环境：部分可观察 + 多Agent + 随机 + 序贯 + 动态 + 连续 + 未知</p><h3>7.3 环境属性速查表（表2.6）</h3><div class=&quot;table-wrap&quot;><table><thead><tr><th>任务</th><th>观察</th><th>Agent</th><th>确定/随机</th><th>片段/序贯</th><th>静态/动态</th><th>离散/连续</th></tr></thead><tbody><tr><td>填字游戏</td><td>完全</td><td>单</td><td>确定</td><td>序贯</td><td>静态</td><td>离散</td></tr><tr><td>带时钟象棋</td><td>完全</td><td>多</td><td>确定</td><td>序贯</td><td>半动态</td><td>离散</td></tr><tr><td>扑克</td><td>部分</td><td>多</td><td>随机</td><td>序贯</td><td>静态</td><td>离散</td></tr><tr><td>双陆棋</td><td>完全</td><td>多</td><td>随机</td><td>序贯</td><td>静态</td><td>离散</td></tr><tr><td>出租车驾驶</td><td>部分</td><td>多</td><td>随机</td><td>序贯</td><td>动态</td><td>连续</td></tr><tr><td>医疗诊断</td><td>部分</td><td>单</td><td>随机</td><td>序贯</td><td>动态</td><td>连续</td></tr></tbody></table></div><h3>7.4 学习Agent四组件速记</h3><div class=&quot;table-wrap&quot;><table><thead><tr><th>组件</th><th>一句话功能</th></tr></thead><tbody><tr><td>性能元件</td><td>接收感知，选择行动（=原来的Agent）</td></tr><tr><td>学习元件</td><td>根据反馈修改性能元件</td></tr><tr><td>评判元件</td><td>按性能标准评价表现，给反馈</td></tr><tr><td>问题产生器</td><td>提议探索性行动，获取新经验</td></tr></tbody></table></div><h3>7.5 考场答题技巧</h3><ul><li>名词解释：先写教材原文定义，再补1个例子，确保满分。</li></ul><ul><li>PEAS题：四个维度都要写，每个维度至少2-3个具体内容，不要只写一个词。</li></ul><ul><li>理性vs完美题：必须答出&quot;理性=期望最大化，完美=实际最大化&quot;这个核心区别。</li></ul><ul><li>环境属性判断题：先给结论，再用定义解释为什么，不要只写结论。</li></ul><ul><li>Agent类型题：按&quot;定义→核心组件→优点→局限→例子&quot;五步法回答。</li></ul><ul><li>画图题（学习Agent模型）：四个组件+环境+传感器+执行器+反馈箭头都要画全。</li></ul></div></div></div><button id=&quot;back-top&quot; onclick=&quot;scrollToTop()&quot;>↑</button>
+<script>
+// 模块展开/折叠
+function toggleModule(header) {
+  var card = header.parentElement;
+  card.classList.toggle('collapsed');
+}
+function expandAll() {
+  document.querySelectorAll('.module-card').forEach(function(c){c.classList.remove('collapsed');});
+}
+function collapseAll() {
+  document.querySelectorAll('.module-card').forEach(function(c){c.classList.add('collapsed');});
+}
+document.getElementById('expand-all').addEventListener('click', expandAll);
+document.getElementById('collapse-all').addEventListener('click', collapseAll);
+
+// 滚动到章节
+function scrollToSection(id) {
+  var el = document.getElementById(id);
+  if (el) {
+    el.classList.remove('collapsed');
+    el.scrollIntoView({behavior:'smooth', block:'start'});
+    closeSidebar();
+  }
+}
+function scrollToTop() {
+  window.scrollTo({top:0, behavior:'smooth'});
+  closeSidebar();
+}
+
+// 进度条 + 回到顶部 + 导航高亮
+window.addEventListener('scroll', function() {
+  var scrollTop = window.pageYOffset;
+  var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  var progress = (scrollTop / docHeight) * 100;
+  document.getElementById('progress-bar').style.width = progress + '%';
+  document.getElementById('back-top').style.display = scrollTop > 300 ? 'block' : 'none';
+
+  // 导航高亮
+  var sections = document.querySelectorAll('.module-card');
+  var navItems = document.querySelectorAll('.nav-item[data-target]');
+  var current = '';
+  sections.forEach(function(s) {
+    if (s.offsetTop - 100 <= scrollTop) current = s.id;
+  });
+  navItems.forEach(function(item) {
+    item.classList.toggle('active', item.getAttribute('data-target') === current);
+  });
+});
+
+// 主题切换
+var themeToggle = document.getElementById('theme-toggle');
+themeToggle.addEventListener('click', function() {
+  var html = document.documentElement;
+  if (html.getAttribute('data-theme') === 'dark') {
+    html.removeAttribute('data-theme');
+    themeToggle.textContent = '🌙';
+  } else {
+    html.setAttribute('data-theme', 'dark');
+    themeToggle.textContent = '☀️';
+  }
+});
+
+// 移动端侧边栏
+var menuToggle = document.getElementById('menu-toggle');
+var sidebar = document.getElementById('sidebar');
+var overlay = document.getElementById('overlay');
+function openSidebar() { sidebar.classList.add('open'); overlay.classList.add('show'); document.body.style.overflow = 'hidden'; }
+function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('show'); document.body.style.overflow = ''; }
+menuToggle.addEventListener('click', function() {
+  if (sidebar.classList.contains('open')) closeSidebar(); else openSidebar();
+});
+overlay.addEventListener('click', closeSidebar);
+
+// ===== 触摸滑动手势：左滑关闭侧边栏，左边缘右滑打开 =====
+var touchStartX = 0, touchStartY = 0, touchCurrentX = 0, isDragging = false, dragDirection = null;
+document.addEventListener('touchstart', function(e) {
+  if (e.touches.length !== 1) return;
+  touchStartX = e.touches[0].clientX; touchStartY = e.touches[0].clientY;
+  touchCurrentX = touchStartX; isDragging = true; dragDirection = null;
+}, {passive: true});
+document.addEventListener('touchmove', function(e) {
+  if (!isDragging) return;
+  touchCurrentX = e.touches[0].clientX;
+  var dx = touchCurrentX - touchStartX, dy = e.touches[0].clientY - touchStartY;
+  if (dragDirection === null && Math.abs(dx) > 10) {
+    dragDirection = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v';
+  }
+  if (sidebar.classList.contains('open') && dragDirection === 'h' && dx < -20) {
+    var tx = Math.max(dx, -sidebar.offsetWidth);
+    sidebar.style.transform = 'translateX(' + tx + 'px)';
+    sidebar.style.transition = 'none';
+    overlay.style.opacity = 1 + (tx / sidebar.offsetWidth) * 0.5;
+  }
+}, {passive: true});
+document.addEventListener('touchend', function(e) {
+  if (!isDragging) return;
+  isDragging = false;
+  var dx = touchCurrentX - touchStartX;
+  sidebar.style.transition = ''; sidebar.style.transform = ''; overlay.style.opacity = '';
+  if (dragDirection !== 'h') return;
+  if (sidebar.classList.contains('open') && dx < -60) { closeSidebar(); return; }
+  if (!sidebar.classList.contains('open') && touchStartX < 30 && dx > 60) { openSidebar(); return; }
+}, {passive: true});
+sidebar.addEventListener('touchmove', function(e) { e.stopPropagation(); }, {passive: true});
+
+// ===== 滚动性能优化（requestAnimationFrame节流）=====
+var _ticking = false;
+window.addEventListener('scroll', function() {
+  if (!_ticking) {
+    window.requestAnimationFrame(function() {
+      var st = window.pageYOffset;
+      var dh = document.documentElement.scrollHeight - window.innerHeight;
+      document.getElementById('progress-bar').style.width = (dh > 0 ? (st/dh)*100 : 0) + '%';
+      document.getElementById('back-top').style.display = st > 300 ? 'block' : 'none';
+      _ticking = false;
+    });
+    _ticking = true;
+  }
+});
+</script>
+</body>
+</html>
+" title="复习笔记"></iframe>
+    </div>
+    <div class="tab-panel" id="panel-mindmap">
+      <iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;zh-CN&quot;>
+<head>
+<meta charset=&quot;UTF-8&quot;>
+<meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover&quot;>
+<title>第二章 智能体 · 交互式思维导图</title>
+<script src=&quot;https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js&quot; onerror=&quot;window.echartsFailed=true&quot;></script>
+<style>
+:root {
+  --bg: #f0f2f5;
+  --card: #ffffff;
+  --text: #1a1b1c;
+  --text2: #6b7280;
+  --border: #e0e0e0;
+  --c1: #2e5c8a; --c1l: #e8f1fb;
+  --c2: #2d7a2d; --c2l: #eaf7e8;
+  --c3: #9a6b00; --c3l: #fff7e6;
+  --c4: #5b2c8a; --c4l: #f3ecfb;
+  --center: #1a365d;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: var(--bg); color: var(--text);
+}
+.main { margin-top:0px; padding:8px 10px 60px; }
+
+/* 工具条 */
+.toolbar { display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
+.toolbar-btn {
+  background:var(--card); border:1px solid var(--border); border-radius:6px;
+  padding:5px 12px; cursor:pointer; font-size:12px; color:var(--text);
+  transition:all 0.2s; min-height:30px;
+}
+.toolbar-btn:active { background:var(--c1l); color:var(--c1); }
+.toolbar .hint { font-size:11px; color:var(--text2); flex:1; min-width:200px; }
+
+/* 图表容器 */
+#chart {
+  width:100%; height:62vh; min-height:360px;
+  background:var(--card); border-radius:12px;
+  box-shadow:0 1px 3px rgba(0,0,0,0.06);
+}
+#chartLoading {
+  display:flex; align-items:center; justify-content:center;
+  height:100%; font-size:13px; color:var(--text2);
+}
+#chartFallback {
+  display:none; padding:40px 20px; text-align:center;
+  font-size:13px; color:var(--text2); line-height:2;
+  background:var(--card); border-radius:12px;
+}
+
+/* 详情面板 */
+.info-panel {
+  position: fixed; top:0px; left:0; right:0; z-index:90;
+  background: var(--card); border-radius:0 0 12px 12px; padding:14px 16px;
+  border-left:4px solid var(--c1); border-bottom:1px solid var(--border);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  display: none; max-height:45vh; overflow-y:auto;
+  -webkit-overflow-scrolling: touch;
+}
+.info-panel-overlay {
+  display: none; position: fixed; inset: 0; z-index: 89;
+  background: transparent;
+}
+.info-panel-overlay.show { display: block; }
+.info-panel.show { display: block; animation: slideDown 0.25s ease; }
+@keyframes slideDown { from { opacity:0; transform:translateY(-12px);} to {opacity:1; transform:translateY(0);} }
+.info-panel h3 { font-size:16px; color:var(--c1); margin-bottom:8px; }
+.info-panel p { font-size:14px; line-height:1.7; color:var(--text); }
+.info-panel .formula {
+  background:var(--c1l); padding:8px 12px; border-radius:6px;
+  font-family:monospace; font-size:13px; margin:8px 0; color:var(--c1);
+  overflow-x:auto;
+}
+.info-panel .close-btn {
+  float:right; background:none; border:none; font-size:18px; cursor:pointer;
+  color:var(--text2); padding:0 4px;
+}
+
+/* 数理逻辑推导链 */
+.logic-section {
+  background: var(--card); border-radius: 12px; padding: 14px 16px;
+  margin-top: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.logic-section h3 {
+  font-size: 15px; color: var(--c1); margin-bottom: 12px;
+  padding-bottom: 8px; border-bottom: 2px solid var(--c1l);
+}
+.logic-chain {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  margin-bottom: 10px; font-size: 13px;
+}
+.logic-chain .step {
+  background: var(--c1l); color: var(--c1); padding: 5px 10px;
+  border-radius: 6px; font-weight: 600;
+}
+.logic-chain .arrow { color: var(--text2); font-size: 14px; }
+.logic-chain .result {
+  background: var(--c2l); color: var(--c2); padding: 5px 10px;
+  border-radius: 6px; font-weight: 600;
+}
+
+/* 图例 */
+.legend {
+  display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;
+  margin-top: 12px; padding: 10px; background: var(--card);
+  border-radius: 10px; font-size: 12px; color: var(--text2);
+}
+.legend-item { display: flex; align-items: center; gap: 5px; }
+.legend-dot { width: 12px; height: 12px; border-radius: 3px; }
+
+/* 节点目录 */
+.node-nav-panel {
+  position: fixed; top:0; left:0; bottom:0; width:280px; max-width:80vw;
+  background: var(--card); z-index:200; box-shadow: 4px 0 16px rgba(0,0,0,0.15);
+  transform: translateX(-100%); transition: transform 0.3s ease;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+}
+.node-nav-panel.show { transform: translateX(0); }
+.node-nav-header {
+  padding: 14px 16px; background: var(--c1); color: #fff;
+  font-size: 15px; font-weight: 600; display: flex; justify-content: space-between; align-items: center;
+}
+.node-nav-close { background:none; border:none; color:#fff; font-size:20px; cursor:pointer; padding:0 4px; }
+.node-nav-list { padding: 8px 0; }
+.node-nav-group { margin-bottom: 4px; }
+.node-nav-branch {
+  padding: 10px 16px; font-size: 13px; font-weight: 600; color: var(--c1);
+  cursor: pointer; display: flex; align-items: center; gap: 6px;
+  min-height:36px;
+}
+.node-nav-branch:active { background: var(--c1l); }
+.node-nav-children { padding-left: 24px; }
+.node-nav-child {
+  padding: 7px 16px 7px 12px; font-size: 12px; color: var(--text);
+  cursor: pointer; border-left: 2px solid var(--border);
+  min-height:36px; display:flex; align-items:center;
+}
+.node-nav-child:active { background: var(--c1l); color: var(--c1); }
+.node-nav-overlay {
+  position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.4);
+  z-index:150; display: none;
+}
+.node-nav-overlay.show { display: block; }
+
+@media (max-width: 600px) {
+  .main { padding: 6px 8px 50px; }
+  #chart { height: 56vh; min-height: 320px; }
+  .toolbar .hint { display:none; }
+  .node-nav-panel { width: 260px; }
+  .node-nav-branch { font-size: 12px; padding: 8px 14px; }
+  .node-nav-child { font-size: 12px; padding: 6px 14px 6px 10px; }
+}
+
+/* 推导链折叠 */
+.logic-section h3{cursor:pointer;user-select:none;display:flex;justify-content:space-between;align-items:center;}
+.lg-arrow{font-size:12px;transition:transform .3s;color:var(--text2,#6b7280);flex-shrink:0;margin-left:8px;}
+.logic-section.collapsed > *:not(h3){display:none !important;}
+.logic-section.collapsed h3{border-bottom:none !important;padding-bottom:0 !important;margin-bottom:0 !important;}
+.logic-section.collapsed .lg-arrow{transform:rotate(-90deg);}
+
+/* 推导链底栏化：收缩时固定底部一行，导图区域占满剩余空间 */
+html,body{height:100%;}
+body{display:flex;flex-direction:column;box-sizing:border-box;padding-bottom:52px;}
+body>.main{flex:1;display:flex;flex-direction:column;min-height:0;}
+#chart{flex:1 1 auto !important;height:auto !important;min-height:280px !important;}
+.logic-section{position:fixed;left:0;right:0;bottom:0;z-index:60;margin:0;border-radius:12px 12px 0 0;box-shadow:0 -2px 12px rgba(0,0,0,.14);max-height:48vh;overflow-y:auto;}
+</style>
+</head>
+<body>
+
+<div class=&quot;main&quot;>
+
+  <div class=&quot;toolbar&quot;>
+    <button class=&quot;toolbar-btn&quot; id=&quot;layoutBtn&quot; onclick=&quot;toggleLayout()&quot;>⇄ 切换横向</button>
+    <button class=&quot;toolbar-btn&quot; onclick=&quot;resetView()&quot;>⌂ 重置视图</button>
+    <span class=&quot;hint&quot;>💡 点击节点查看详情 · 点击有子节点的节点就地展开/收起 · 支持缩放与拖动</span>
+  </div>
+
+  <div id=&quot;chart&quot;><div id=&quot;chartLoading&quot;>正在加载图表引擎…（首次需联网加载 ECharts）</div></div>
+  <div id=&quot;chartFallback&quot;>
+    <p>⚠️ 图表引擎加载失败（无法访问 CDN）</p>
+    <p><button class=&quot;toolbar-btn&quot; onclick=&quot;location.reload()&quot;>重新加载</button></p>
+  </div>
+
+  <!-- 数理逻辑推导链 -->
+  <div class=&quot;logic-section collapsed&quot;><h3 onclick=&quot;this.parentElement.classList.toggle('collapsed')&quot;>📐 数理逻辑推导链<span class=&quot;lg-arrow&quot;>▼</span></h3>
+    <div class=&quot;logic-chain&quot;>
+      <span class=&quot;step&quot;>感知序列</span>
+      <span class=&quot;arrow&quot;>→</span>
+      <span class=&quot;step&quot;>Agent函数 f:P*→A</span>
+      <span class=&quot;arrow&quot;>→</span>
+      <span class=&quot;step&quot;>Agent程序实现</span>
+      <span class=&quot;arrow&quot;>→</span>
+      <span class=&quot;result&quot;>行动输出</span>
+    </div>
+    <div class=&quot;logic-chain&quot;>
+      <span class=&quot;step&quot;>性能度量+先验知识+行动集+感知序列</span>
+      <span class=&quot;arrow&quot;>⇒</span>
+      <span class=&quot;step&quot;>理性行动 a*=argmax E[Perf|evid]</span>
+      <span class=&quot;arrow&quot;>≠</span>
+      <span class=&quot;step&quot;>全知(预知未来)</span>
+      <span class=&quot;arrow&quot;>≠</span>
+      <span class=&quot;result&quot;>完美(实际最优)</span>
+    </div>
+    <div class=&quot;logic-chain&quot;>
+      <span class=&quot;step&quot;>简单反射(无记忆)</span>
+      <span class=&quot;arrow&quot;>+内部模型→</span>
+      <span class=&quot;step&quot;>基于模型</span>
+      <span class=&quot;arrow&quot;>+目标→</span>
+      <span class=&quot;step&quot;>基于目标</span>
+      <span class=&quot;arrow&quot;>+效用函数→</span>
+      <span class=&quot;step&quot;>基于效用</span>
+      <span class=&quot;arrow&quot;>+学习→</span>
+      <span class=&quot;result&quot;>学习Agent</span>
+    </div>
+    <div class=&quot;logic-chain&quot;>
+      <span class=&quot;step&quot;>部分可观察+多Agent+随机+序贯+动态+连续+未知</span>
+      <span class=&quot;arrow&quot;>⇒</span>
+      <span class=&quot;result&quot;>最难任务环境（自动驾驶）</span>
+    </div>
+  </div>
+
+  <!-- 图例 -->
+  <div class=&quot;legend&quot;>
+    <div class=&quot;legend-item&quot;><div class=&quot;legend-dot&quot; style=&quot;background:#0f766e&quot;></div>绪论</div>
+    <div class=&quot;legend-item&quot;><div class=&quot;legend-dot&quot; style=&quot;background:var(--c1)&quot;></div>定义层</div>
+    <div class=&quot;legend-item&quot;><div class=&quot;legend-dot&quot; style=&quot;background:var(--c2)&quot;></div>标准层</div>
+    <div class=&quot;legend-item&quot;><div class=&quot;legend-dot&quot; style=&quot;background:var(--c3)&quot;></div>环境层</div>
+    <div class=&quot;legend-item&quot;><div class=&quot;legend-dot&quot; style=&quot;background:var(--c4)&quot;></div>结构层</div>
+    <div class=&quot;legend-item&quot;>💡 滚轮/双指缩放 · 拖动平移</div>
+  </div>
+
+</div>
+
+<!-- 节点详情面板 -->
+<div class=&quot;info-panel-overlay&quot; id=&quot;infoPanelOverlay&quot; onclick=&quot;closeInfo()&quot;></div>
+<div class=&quot;info-panel&quot; id=&quot;infoPanel&quot;>
+  <button class=&quot;close-btn&quot; onclick=&quot;closeInfo()&quot;>×</button>
+  <h3 id=&quot;infoTitle&quot;></h3>
+  <div id=&quot;infoContent&quot;></div>
+</div>
+
+<!-- 节点目录 -->
+<div class=&quot;node-nav-overlay&quot; id=&quot;nodeNavOverlay&quot; onclick=&quot;closeNodeNav()&quot;></div>
+<div class=&quot;node-nav-panel&quot; id=&quot;nodeNavPanel&quot;>
+  <div class=&quot;node-nav-header&quot;>
+    <span>🧠 思维导图目录</span>
+    <button class=&quot;node-nav-close&quot; onclick=&quot;closeNodeNav()&quot;>×</button>
+  </div>
+  <div class=&quot;node-nav-list&quot; id=&quot;nodeNavList&quot;></div>
+</div>
+
+<script>
+// ===== 知识点数据（由子代理生成） =====
+var BRANCH_META = [
+  { key:'branch0', name:'第1章 绪论', short:'绪论', color:'#0f766e', light:'#e6f4f2', groups:[
+    { short:'核心概念', kids:[
+      ['AI四种定义','ai_definitions'],
+      ['图灵测试','turing_test'],
+      ['发展简史','ai_history']
+    ]}
+  ]},
+  { key:'branch1', name:'2.1 智能体是什么', short:'智能体', color:'#2e5c8a', light:'#e8f1fb', groups:[
+    { short:'核心定义', kids:[
+      ['Agent定义','agent_def'],
+      ['传感器与执行器','sensors_actuators'],
+      ['感知与感知序列','percept_sequence']
+    ]},
+    { short:'函数与程序', kids:[
+      ['Agent函数 f:P*→A','agent_function'],
+      ['Agent程序与架构','agent_program']
+    ]}
+  ]},
+  { key:'branch2', name:'2.2 什么是理性', short:'理性', color:'#2d7a2d', light:'#eaf7e8', groups:[
+    { short:'理性标准', kids:[
+      ['理性Agent定义','rational_def'],
+      ['理性四要素','four_elements']
+    ]},
+    { short:'关键辨析', kids:[
+      ['理性≠全知≠完美','rational_vs_perfect'],
+      ['学习与自主性','learning_autonomy']
+    ]}
+  ]},
+  { key:'branch3', name:'2.3 任务环境', short:'环境', color:'#9a6b00', light:'#fff7e6', groups:[
+    { short:'PEAS框架', kids:[
+      ['PEAS四要素','peas_framework'],
+      ['经典示例','peas_examples']
+    ]},
+    { short:'7大属性维度', kids:[
+      ['7大维度','seven_dims'],
+      ['最难环境组合','hardest_env'],
+      ['表2.6典型环境','table26']
+    ]}
+  ]},
+  { key:'branch4', name:'2.4 智能体结构', short:'结构', color:'#5b2c8a', light:'#f3ecfb', groups:[
+    { short:'四种基本类型', kids:[
+      ['简单反射','simple_reflex'],
+      ['基于模型','model_based'],
+      ['基于目标','goal_based'],
+      ['基于效用','utility_based']
+    ]},
+    { short:'学习Agent', kids:[
+      ['四组件','learning_parts'],
+      ['协作流程','learning_flow']
+    ]}
+  ]}
+];
+
+var branchInfo = {
+  branch0: { title: '第1章 绪论', content: '<p>本章回答&quot;什么是人工智能&quot;：从<strong>思维/行为 × 类人/理性</strong> 2×2框架给出AI四种定义，并介绍图灵测试与发展简史。</p><p>全书立场：<strong>人工智能 = 理性地行动 = 研究理性Agent</strong>，智能Agent是贯穿全书的核心概念。</p>' },
+  branch1: { title: '2.1 智能体是什么', content: '<p>Agent = 传感器感知环境 + 执行器作用于环境的任何事物。</p><p>核心公式：<strong>Agent = 体系结构（硬件） + Agent程序（软件）</strong>。</p><p>Agent函数是抽象数学映射（感知序列→行动），Agent程序是具体代码实现（输入当前感知）。</p>' },
+  branch2: { title: '2.2 什么是理性', content: '<p>理性 = 基于感知证据和先验知识，选择使性能度量期望值最大化的行动。</p><p>核心公式：<strong>a* = argmax E[Performance | evidence]</strong>。</p><p>理性 ≠ 全知 ≠ 完美；学习是获得自主性的关键。</p>' },
+  branch3: { title: '2.3 任务环境', content: '<p>用 PEAS 描述任务环境，从 7 个维度刻画环境特性。</p><p>最难环境 = 部分可观察+多Agent+随机+序贯+动态+连续+未知（典型：自动驾驶）。</p>' },
+  branch4: { title: '2.4 智能体结构', content: '<p>四种基本Agent按能力升级：</p><p>简单反射 → 基于模型 → 基于目标 → 基于效用。</p><p>学习Agent = 性能元件 + 学习元件 + 评判元件 + 问题产生器。</p>' }
+};
+
+var nodeInfo = {
+  ai_definitions: { title: 'AI四种定义', content: '<p><strong>2×2框架</strong>（思维/行为 × 类人/理性）：</p><p>• <strong>像人一样思考</strong>：认知建模途径（认知科学）</p><p>• <strong>理性地思考</strong>：&quot;思维法则&quot;途径（逻辑学传统）</p><p>• <strong>像人一样行动</strong>：图灵测试途径</p><p>• <strong>理性地行动</strong>：理性Agent途径——<strong>本书采用的定义</strong></p><p>理性Agent = 能够实现最佳期望结果而行动的Agent。</p>' },
+  turing_test: { title: '图灵测试', content: '<p><strong>图灵(1950)</strong>《计算机器与智能》：询问者通过文本提问，无法区分对方是人还是机器即通过测试。</p><p><strong>完全图灵测试六项能力</strong>：自然语言处理、知识表示、自动推理、机器学习 +（视频/实物操作）计算机视觉、机器人学。</p><p>属于&quot;像人一样行动&quot;途径的测试标准。</p>' },
+  ai_history: { title: '发展简史', content: '<p><strong>关键节点</strong>：</p><p>• 1943 McCulloch与Pitts神经元模型</p><p>• 1950 图灵测试提出</p><p>• 1956 达特茅斯会议，AI正式命名诞生</p><p>• 1952-1969 早期热潮（GPS、LISP、感知机）</p><p>• 1966-1973 第一次寒冬（感知机局限、机器翻译失败）</p><p>• 1969-1979 专家系统（DENDRAL、MYCIN）</p><p>• 1986 反向传播复兴神经网络</p><p>• 1987-1993 第二次寒冬 → 1995后智能Agent与数据驱动 → 2011起深度学习爆发</p>' },
+  agent_def: { title: 'Agent定义', content: '<p><strong>教材黑体定义</strong>：Agent是任何能通过<strong>传感器</strong>感知环境、并通过<strong>执行器</strong>作用于该环境的事物。</p><p>工作循环：感知环境 → 处理决策 → 执行行动 → 改变环境 → 再次感知。</p><p><strong>例子</strong>：人、机器人、恒温器、软件程序都算Agent。</p>' },
+  sensors_actuators: { title: '传感器与执行器', content: '<p><strong>传感器（Sensors）</strong>：Agent的&quot;输入器官&quot;，感知环境。如摄像头、雷达、麦克风、键盘。</p><p><strong>执行器（Actuators）</strong>：Agent的&quot;输出器官&quot;，作用于环境。如机械臂、轮子、显示屏。</p><p>传感器决定信息获取能力，执行器决定行动空间。</p>' },
+  percept_sequence: { title: '感知与感知序列', content: '<p><strong>感知（Percept）</strong>：任一时刻通过传感器接收的输入。</p><p><strong>感知序列（Percept Sequence）</strong>：从开始到当前的全部感知历史，是Agent决策的全部信息依据。</p><p>Agent函数的输入是<strong>完整感知序列</strong>，Agent程序的输入是<strong>当前感知</strong>。</p>' },
+  agent_function: { title: 'Agent函数 f:P*→A', content: '<p><strong>Agent函数</strong>：抽象数学映射 f: P* → A，将任意感知序列映射为一个行动。</p><p>理论可用巨型查找表表示，但定义域无穷大、实际不可实现。</p><p>一个Agent函数可由多个不同的Agent程序实现。</p>' },
+  agent_program: { title: 'Agent程序与架构', content: '<p><strong>Agent程序</strong>：Agent函数在物理硬件上的代码实现。</p><p>每次被调用接收&quot;当前感知&quot;，返回一个行动；若需历史信息，必须自己内部存储。</p><p><strong>核心公式</strong>：Agent = 体系结构（硬件） + Agent程序（软件）。</p>' },
+
+  rational_def: { title: '理性Agent定义', content: '<p><strong>理性Agent</strong>：对每一个可能的感知序列，根据已知感知证据和先验知识，选择能使性能度量<strong>期望值最大化</strong>的行动。</p><p><strong>核心公式</strong>：a* = argmax_a E[Performance | evidence]</p><p>理性只对<strong>当下掌握的信息</strong>负责，不保证结果完美。</p>' },
+  four_elements: { title: '理性四要素', content: '<p>判断行动是否理性，必须同时考虑四要素：</p><p>① <strong>性能度量</strong>：评判成功的标准（应基于结果，非过程）</p><p>② <strong>环境先验知识</strong>：Agent预先知道的环境信息</p><p>③ <strong>可执行行动</strong>：可采取的行为集合</p><p>④ <strong>感知序列</strong>：到当前为止的全部感知历史</p>' },
+  rational_vs_perfect: { title: '理性≠全知≠完美', content: '<p><strong>三者辨析</strong>（最高频考点）：</p><p>• <strong>理性</strong>：基于可用信息最大化期望性能，可实现</p><p>• <strong>全知</strong>：预知行动的真实结果，不可能存在</p><p>• <strong>完美</strong>：实际性能最大化，依赖运气</p><p>核心句：&quot;理性是使期望的性能最大化，完美是使实际的性能最大化&quot;。</p>' },
+  learning_autonomy: { title: '学习与自主性', content: '<p><strong>学习</strong>：通过感知经验不断更新知识、改进行为。</p><p><strong>自主性</strong>：行为由自身从环境中学到的知识决定，而非完全依赖预设规则。</p><p>核心关系：<strong>学习能力是获得自主性的关键</strong>。</p><p>教材反例：蜣螂、泥蜂被挪走粪球/毛虫后仍机械执行预设步骤。</p>' },
+
+  peas_framework: { title: 'PEAS四要素', content: '<p><strong>PEAS</strong>：描述任务环境的标准四要素框架，是设计Agent前的第一步。</p><p>• <strong>P</strong> 性能度量：怎样算&quot;成功&quot;（基于结果，非过程）</p><p>• <strong>E</strong> 环境：在什么世界里运行（包括其他Agent）</p><p>• <strong>A</strong> 执行器：能做什么动作</p><p>• <strong>S</strong> 传感器：能感知什么</p><p>记忆口诀：<strong>P绩E环A执S感</strong>。</p>' },
+  peas_examples: { title: '经典示例', content: '<p><strong>自动驾驶出租车</strong>：P=安全/快速/合法/舒适，E=道路/车辆/行人/天气，A=方向盘/油门/刹车，S=摄像头/雷达/GPS。</p><p><strong>机器人足球</strong>（2024真题20分）：P=进球数/控球率/传球成功率，E=球场/足球/队友/对手/裁判，A=腿（踢/带）/身体（移动/阻挡）/头（顶球），S=摄像头/距离传感器/无线通信。</p>' },
+  seven_dims: { title: '7大维度', content: '<p>任务环境可从7个<strong>独立</strong>维度分类（互不绑定、任意组合）：</p><p>① 可观察性：完全 vs 部分</p><p>② 确定性：确定 vs 随机</p><p>③ 片段性：片段 vs 序贯</p><p>④ 动态性：静态 vs 动态（含半动态）</p><p>⑤ 离散性：离散 vs 连续</p><p>⑥ Agent数量：单 vs 多</p><p>⑦ 知识完整性：已知 vs 未知</p>' },
+  hardest_env: { title: '最难环境组合', content: '<p><strong>最难环境</strong>：部分可观察 + 多Agent + 随机 + 序贯 + 动态 + 连续 + 未知</p><p><strong>典型代表</strong>：自动驾驶出租车</p><p>反向记忆：填字游戏是最简单组合（完全/单/确定/序贯/静态/离散）。</p>' },
+  table26: { title: '表2.6典型环境', content: '<p><strong>教材表2.6</strong>十个典型环境必背：</p><p>• 填字游戏：完全/单/确定/序贯/静态/离散</p><p>• 带时钟象棋：完全/多/确定/序贯/<strong>半动态</strong>/离散</p><p>• 扑克：部分/多/随机/序贯/静态/离散</p><p>• 双陆棋：完全/多/随机/序贯/静态/离散</p><p>• 出租车：部分/多/随机/序贯/<strong>动态</strong>/<strong>连续</strong></p><p>• 医疗诊断：部分/单/随机/序贯/动态/连续</p><p>记忆抓手：只有带时钟象棋是半动态；动态+连续只有出租车和医疗诊断。</p>' },
+
+  simple_reflex: { title: '简单反射Agent', content: '<p><strong>简单反射Agent</strong>：仅根据当前感知选择行动，基于条件-动作规则（if-then），<strong>无内部状态、无记忆</strong>。</p><p><strong>优点</strong>：结构最简单、反应快、易实现。</p><p><strong>重大局限</strong>：只能用于完全可观察环境，部分可观察下容易失效。</p><p><strong>例子</strong>：两格吸尘器（有灰吸尘、干净移动）、看到红灯就刹车。</p>' },
+  model_based: { title: '基于模型Agent', content: '<p><strong>基于模型的反射Agent</strong>：维护<strong>内部状态</strong>追踪不可直接观察的环境部分，依赖<strong>世界模型</strong>预测环境变化及行动后果。</p><p>世界模型两大件：<strong>转移模型</strong>（行动如何改变世界状态）+ <strong>传感器模型</strong>（世界状态如何产生感知）。</p><p><strong>与简单反射的区别</strong>：多了&quot;记忆&quot;——能推断&quot;看不到但能推出来的东西&quot;。</p>' },
+  goal_based: { title: '基于目标Agent', content: '<p><strong>基于目标的Agent</strong>：在基于模型基础上增加<strong>目标</strong>信息，知道&quot;想要达到什么状态&quot;，通过搜索或规划选择行动序列。</p><p><strong>优点</strong>：更灵活，目标改变即可适应新任务。</p><p><strong>局限</strong>：不区分目标优先级，无法在多个冲突目标间权衡。</p><p><strong>例子</strong>：GPS导航、迷宫求解机器人。</p>' },
+  utility_based: { title: '基于效用Agent', content: '<p><strong>基于效用的Agent</strong>：使用<strong>效用函数U(s)</strong>将状态映射为实数，表示&quot;合意程度&quot;，选择最大化期望效用的行动。</p><p><strong>三大优势</strong>：</p><p>① 多条路都能到目标时，选&quot;更好&quot;的那条</p><p>② 多个竞争性目标间能权衡（安全但慢 vs 危险但快）</p><p>③ 能在不确定性环境下做风险决策</p><p><strong>例子</strong>：医疗诊断（治疗效果/副作用/费用间权衡）。</p>' },
+  learning_parts: { title: '四组件', content: '<p><strong>学习Agent四组件</strong>（2020年期中20分大题）：</p><p>① <strong>性能元件</strong>：接收感知、选择行动（=原来的Agent本身）</p><p>② <strong>学习元件</strong>：根据评判元件反馈修改性能元件</p><p>③ <strong>评判元件</strong>：按固定性能标准评价表现、给反馈</p><p>④ <strong>问题产生器</strong>：提议探索性行动，获取新经验</p><p>关键认知：性能元件就是原来的Agent本身，前四类Agent都属于性能元件。</p>' },
+  learning_flow: { title: '协作流程', content: '<p><strong>四组件协作流程</strong>（画图题要画全）：</p><p>性能元件与环境交互（感知→行动）→ 评判元件按性能标准评价、给反馈 → 学习元件根据反馈修改性能元件 → 问题产生器建议探索性行动 → 循环。</p><p>高频选择题：&quot;学习Agent中根据性能标准评价Agent表现的组件是？&quot;答案：<strong>评判元件</strong>。</p>' }
+};
+
+function leafNode(short, key, meta) {
+  return { name: short, short: short, key: key,
+    itemStyle: { color: '#ffffff', borderColor: meta.color, borderWidth: 1.2 },
+    symbolSize: 7 };
+}
+
+function subNode(short, meta) {
+  return { name: short, short: short,
+    itemStyle: { color: meta.color }, symbolSize: 10,
+    label: { color: meta.color, fontWeight: 600 } };
+}
+
+var treeData = {
+  name: '第二章 智能体', short: '第二章 智能体', key: 'center',
+  symbolSize: 16, collapsed: false,
+  itemStyle: { color: '#1a365d' },
+  label: { color: '#1a365d', fontWeight: 700, fontSize: 14 },
+  children: BRANCH_META.map(function(meta) {
+    return {
+      name: meta.name, short: meta.short, key: meta.key,
+      symbolSize: 13, collapsed: false,
+      itemStyle: { color: meta.color },
+      label: { color: meta.color, fontWeight: 700 },
+      children: meta.groups.map(function(g) {
+        var sub = subNode(g.short, meta);
+        sub.children = g.kids.map(function(k) { return leafNode(k[0], k[1], meta); });
+        return sub;
+      })
+    };
+  })
+};
+
+// ===== ECharts 树图 =====
+var isMobile = window.innerWidth < 600;
+var layout = isMobile ? 'LR' : 'radial';
+var chart = null;
+var chartDone = false;
+
+function buildOption() {
+  return {
+    animationDuration: 300,
+    animationDurationUpdate: 450,
+    series: [{
+      type: 'tree',
+      data: [treeData],
+      layout: layout,
+      left: '10%', right: '24%', top: '12%', bottom: '12%',
+      roam: true,
+      symbol: 'circle',
+      expandAndCollapse: true,
+      initialTreeDepth: -1,
+      label: {
+        position: layout === 'radial' ? 'radial' : 'right',
+        rotate: 0,
+        verticalAlign: 'middle',
+        align: layout === 'radial' ? undefined : 'left',
+        fontSize: isMobile ? 11 : 12,
+        color: '#444',
+        formatter: function(p) { return p.data.short || p.name; }
+      },
+      leaves: {
+        label: { position: 'right', fontSize: isMobile ? 11 : 12, color: '#555' }
+      },
+      edgeForkPosition: '65%',
+      lineStyle: { color: '#c8cdd4', width: 1.2, curveness: 0.5 },
+      emphasis: { itemStyle: { shadowBlur: 8, shadowColor: 'rgba(0,0,0,0.25)' } }
+    }]
+  };
+}
+
+function refresh() {
+  if (chart) chart.setOption({ series: [{ data: [treeData] }] });
+}
+
+function initChart() {
+  var el = document.getElementById('chart');
+  if (!window.echarts) {
+    el.style.display = 'none';
+    document.getElementById('chartFallback').style.display = 'block';
+    return;
+  }
+  chart = echarts.init(el);
+  chart.setOption(buildOption());
+  chart.on('click', function(p) {
+    var d = p.data;
+    if (d.children && d.children.length) {
+      d.collapsed = !d.collapsed;
+      refresh();
+    }
+    if (d.key) showInfo(d.key);
+  });
+}
+
+function tryInit() {
+  if (chartDone) return;
+  var el = document.getElementById('chart');
+  if (el.offsetWidth === 0) return;
+  if (!window.echarts && !window.echartsFailed) return;
+  chartDone = true;
+  initChart();
+}
+window.addEventListener('load', function() { setTimeout(tryInit, 60); });
+setInterval(tryInit, 400);
+window.addEventListener('resize', function() {
+  if (chart) chart.resize();
+});
+
+function toggleLayout() {
+  layout = layout === 'radial' ? 'LR' : 'radial';
+  document.getElementById('layoutBtn').textContent = layout === 'radial' ? '⇄ 切换横向' : '◉ 切换径向';
+  if (chart) chart.setOption(buildOption(), true);
+}
+function resetView() {
+  if (chart) chart.setOption(buildOption(), true);
+}
+
+// ===== 详情面板 =====
+function showInfo(key) {
+  var info = nodeInfo[key] || branchInfo[key];
+  if (!info) return;
+  document.getElementById('infoTitle').textContent = info.title;
+  document.getElementById('infoContent').innerHTML = info.content;
+  document.getElementById('infoPanel').classList.add('show');
+  document.getElementById('infoPanelOverlay').classList.add('show');
+}
+function closeInfo() {
+  document.getElementById('infoPanel').classList.remove('show');
+  document.getElementById('infoPanelOverlay').classList.remove('show');
+}
+
+// ===== 展开/折叠 =====
+function setCollapsedDeep(node, collapsed) {
+  if (node.children && node.children.length) {
+    node.collapsed = collapsed;
+    node.children.forEach(function(c) { setCollapsedDeep(c, collapsed); });
+  }
+}
+function expandAll() {
+  setCollapsedDeep(treeData, false);
+  refresh();
+}
+function collapseAll() {
+  treeData.collapsed = false;
+  treeData.children.forEach(function(b) { setCollapsedDeep(b, true); });
+  closeInfo();
+  refresh();
+}
+
+// ===== 节点目录 =====
+function openNodeNav() {
+  document.getElementById('nodeNavPanel').classList.add('show');
+  document.getElementById('nodeNavOverlay').classList.add('show');
+  generateNodeNav();
+}
+function closeNodeNav() {
+  document.getElementById('nodeNavPanel').classList.remove('show');
+  document.getElementById('nodeNavOverlay').classList.remove('show');
+}
+function findPath(nodes, key, path) {
+  for (var i = 0; i < nodes.length; i++) {
+    var n = nodes[i];
+    var p2 = path.concat([n]);
+    if (n.key === key) return p2;
+    if (n.children) {
+      var r = findPath(n.children, key, p2);
+      if (r) return r;
+    }
+  }
+  return null;
+}
+function expandTo(key) {
+  var path = findPath([treeData], key, []);
+  if (!path) return;
+  path.forEach(function(n) { n.collapsed = false; });
+  refresh();
+}
+function generateNodeNav() {
+  var list = document.getElementById('nodeNavList');
+  list.innerHTML = '';
+  var center = document.createElement('div');
+  center.className = 'node-nav-branch';
+  center.innerHTML = '⭐ 第二章 智能体';
+  center.onclick = function() { closeNodeNav(); expandTo('center'); showInfo('center'); };
+  list.appendChild(center);
+  var icons = ['📖', '📘', '📗', '📙', '📕'];
+  treeData.children.forEach(function(branch, i) {
+    var group = document.createElement('div');
+    group.className = 'node-nav-group';
+    var title = document.createElement('div');
+    title.className = 'node-nav-branch';
+    title.innerHTML = icons[i] + ' ' + branch.name;
+    title.onclick = function() { closeNodeNav(); expandTo(branch.key); showInfo(branch.key); };
+    group.appendChild(title);
+    var container = document.createElement('div');
+    container.className = 'node-nav-children';
+    branch.children.forEach(function(sub) {
+      var label = document.createElement('div');
+      label.className = 'node-nav-child';
+      label.style.fontWeight = '600';
+      label.style.color = 'var(--text2)';
+      label.textContent = '· ' + (sub.short || sub.name);
+      container.appendChild(label);
+      sub.children.forEach(function(child) {
+        var item = document.createElement('div');
+        item.className = 'node-nav-child';
+        item.textContent = child.short || child.name;
+        item.onclick = function() { closeNodeNav(); expandTo(child.key); showInfo(child.key); };
+        container.appendChild(item);
+      });
+    });
+    group.appendChild(container);
+    list.appendChild(group);
+  });
+}
+</script>
+</body>
+</html>
+" title="思维导图"></iframe>
+    </div>
+  </div>
+</div>
+</script>
+</body>
+</html>
+" title="复习笔记"></iframe>
+    </div>
+    <div class="tab-panel" id="panel-mindmap">
+      <iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;zh-CN&quot;>
+<head>
+<meta charset=&quot;UTF-8&quot;>
+<meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover&quot;>
+<title>第二章 智能体 · 交互式思维导图</title>
+<style>
+:root {
+  --bg: #f0f2f5;
+  --card: #ffffff;
+  --text: #1a1b1c;
+  --text2: #6b7280;
+  --border: #e0e0e0;
+  --c1: #2e5c8a; --c1l: #e8f1fb;
+  --c2: #2d7a2d; --c2l: #eaf7e8;
+  --c3: #9a6b00; --c3l: #fff7e6;
+  --c4: #5b2c8a; --c4l: #f3ecfb;
+  --center: #1a365d;
+}
+[data-theme=&quot;dark&quot;] {
+  --bg: #1a1d23; --card: #252830; --text: #e4e6eb; --text2: #9ca3af; --border: #374151;
+  --c1l: #1e3a5f; --c2l: #1a3a1a; --c3l: #3d3520; --c4l: #2d1f4a;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, &quot;PingFang SC&quot;, &quot;Microsoft YaHei&quot;, sans-serif;
+  background: var(--bg); color: var(--text);
+  overflow-x: hidden; transition: background 0.3s, color 0.3s;
+}
+/* 顶部栏 */
+.topbar {
+  display: none !important; position: fixed; top:0; left:0; right:0; height:50px;
+  background: var(--card); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 16px; z-index:100;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.topbar-title { font-size:15px; font-weight:700; color:var(--c1); flex:1; margin-left:10px; }
+.topbar-btn {
+  background:none; border:1px solid var(--border); border-radius:6px;
+  padding:5px 10px; cursor:pointer; font-size:13px; color:var(--text);
+  margin-left:6px; transition:all 0.2s; min-height:36px;
+}
+.topbar-btn:hover { background:var(--c1l); }
+.topbar-btn.active { background:var(--c1); color:#fff; border-color:var(--c1); }
+
+/* 主容器 */
+.main { margin-top:0px; padding:12px; padding-bottom:60px; }
+
+/* 说明面板 */
+.info-panel {
+  position: fixed; top:0px; left:0; right:0; z-index:90;
+  background: var(--card); border-radius:0 0 12px 12px; padding:14px 16px;
+  border-left:4px solid var(--c1); border-bottom:1px solid var(--border);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+  display: none; max-height:45vh; overflow-y:auto;
+  -webkit-overflow-scrolling: touch;
+}
+.info-panel.show { display: block; animation: slideDown 0.25s ease; }
+@keyframes slideDown { from { opacity:0; transform:translateY(-12px);} to {opacity:1; transform:translateY(0);} }
+@keyframes slideIn { from { opacity:0; transform:translateY(-8px);} to {opacity:1; transform:translateY(0);} }
+.info-panel h3 { font-size:16px; color:var(--c1); margin-bottom:8px; }
+.info-panel p { font-size:14px; line-height:1.7; color:var(--text); }
+.info-panel .formula {
+  background:var(--c1l); padding:8px 12px; border-radius:6px;
+  font-family: monospace; font-size:13px; margin:8px 0; color:var(--c1);
+}
+.info-panel .close-btn {
+  float:right; background:none; border:none; font-size:18px; cursor:pointer;
+  color:var(--text2); padding:0 4px;
+}
+
+/* 思维导图容器 */
+.mindmap-container {
+  background: var(--card); border-radius:12px; padding:16px 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+}
+.mindmap {
+  display: flex; flex-direction: column; gap: 0;
+  min-width: 320px;
+}
+
+/* 中心节点 */
+.center-node {
+  display: flex; justify-content: center; margin-bottom: 20px;
+}
+.center-node .node {
+  background: linear-gradient(135deg, var(--center), var(--c1));
+  color: #fff; padding: 14px 28px; border-radius: 14px;
+  font-size: 17px; font-weight: 700; text-align: center;
+  box-shadow: 0 4px 12px rgba(46,92,138,0.3);
+  cursor: pointer; transition: transform 0.2s;
+  min-width: 160px;
+}
+.center-node .node:hover { transform: scale(1.03); }
+.center-node .node .sub { font-size:11px; font-weight:400; opacity:0.85; margin-top:2px; }
+
+/* 分支行 */
+.branch-row {
+  display: flex; gap: 12px; justify-content: center;
+  flex-wrap: wrap; margin-bottom: 12px;
+}
+
+/* 分支组 */
+.branch-group {
+  flex: 1 1 280px; max-width: 360px; min-width: 260px;
+}
+.branch-header {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px; border-radius: 10px; cursor: pointer;
+  transition: all 0.2s; user-select: none;
+  margin-bottom: 6px;
+}
+.branch-header:hover { filter: brightness(0.97); }
+.branch-header .icon {
+  width: 28px; height: 28px; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; color: #fff; font-weight: 700; flex-shrink: 0;
+}
+.branch-header .title {
+  font-size: 14px; font-weight: 700; flex: 1;
+}
+.branch-header .toggle {
+  font-size: 14px; transition: transform 0.3s; color: var(--text2);
+}
+.branch-group.collapsed .toggle { transform: rotate(-90deg); }
+.branch-group.collapsed .branch-children { display: none; }
+
+/* 分支颜色 */
+.branch-group[data-color=&quot;1&quot;] .branch-header { background: var(--c1l); }
+.branch-group[data-color=&quot;1&quot;] .icon { background: var(--c1); }
+.branch-group[data-color=&quot;1&quot;] .title { color: var(--c1); }
+.branch-group[data-color=&quot;2&quot;] .branch-header { background: var(--c2l); }
+.branch-group[data-color=&quot;2&quot;] .icon { background: var(--c2); }
+.branch-group[data-color=&quot;2&quot;] .title { color: var(--c2); }
+.branch-group[data-color=&quot;3&quot;] .branch-header { background: var(--c3l); }
+.branch-group[data-color=&quot;3&quot;] .icon { background: var(--c3); }
+.branch-group[data-color=&quot;3&quot;] .title { color: var(--c3); }
+.branch-group[data-color=&quot;4&quot;] .branch-header { background: var(--c4l); }
+.branch-group[data-color=&quot;4&quot;] .icon { background: var(--c4); }
+.branch-group[data-color=&quot;4&quot;] .title { color: var(--c4); }
+
+/* 子节点 */
+.branch-children {
+  padding-left: 18px; border-left: 2px solid var(--border);
+  margin-left: 24px; padding-top: 4px; padding-bottom: 4px;
+}
+.child-node {
+  padding: 7px 12px; margin-bottom: 5px; border-radius: 7px;
+  font-size: 13px; cursor: pointer; transition: all 0.15s;
+  background: var(--bg); border: 1px solid transparent;
+  position: relative;
+}
+.child-node:hover {
+  border-color: var(--border); background: var(--card);
+  transform: translateX(3px);
+}
+.child-node .node-title { font-weight: 600; }
+.child-node .node-desc {
+  font-size: 11.5px; color: var(--text2); margin-top: 2px;
+  display: none;
+}
+.child-node.expanded .node-desc { display: block; animation: fadeIn 0.2s; }
+@keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+.child-node .arrow {
+  float: right; font-size: 11px; color: var(--text2);
+  transition: transform 0.2s;
+}
+.child-node.expanded .arrow { transform: rotate(90deg); }
+
+/* 关系连线提示 */
+.relation-hint {
+  text-align: center; font-size: 12px; color: var(--text2);
+  margin: 8px 0; padding: 6px;
+}
+.relation-hint .arrow-down { font-size: 16px; color: var(--c1); }
+
+/* 底部图例 */
+.legend {
+  display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;
+  margin-top: 16px; padding: 12px; background: var(--card);
+  border-radius: 10px; font-size: 12px; color: var(--text2);
+}
+.legend-item { display: flex; align-items: center; gap: 5px; }
+.legend-dot { width: 12px; height: 12px; border-radius: 3px; }
+
+/* 数理逻辑关系区 */
+.logic-section {
+  background: var(--card); border-radius: 12px; padding: 16px 20px;
+  margin-top: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.logic-section h3 {
+  font-size: 15px; color: var(--c1); margin-bottom: 12px;
+  padding-bottom: 8px; border-bottom: 2px solid var(--c1l);
+}
+.logic-chain {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  margin-bottom: 10px; font-size: 13px;
+}
+.logic-chain .step {
+  background: var(--c1l); color: var(--c1); padding: 5px 10px;
+  border-radius: 6px; font-weight: 600;
+}
+.logic-chain .arrow { color: var(--text2); font-size: 14px; }
+.logic-chain .result {
+  background: var(--c2l); color: var(--c2); padding: 5px 10px;
+  border-radius: 6px; font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  .branch-group { flex: 1 1 100%; max-width: 100%; }
+  .center-node .node { padding: 12px 20px; font-size: 15px; min-width: 140px; }
+  .main { padding: 12px; }
+  .child-node { font-size: 12.5px; }
+}
+
+/* 节点目录弹出层 */
+.node-nav-panel {
+  position: fixed; top:0; left:0; bottom:0; width:280px; max-width:80vw;
+  background: var(--card); z-index:200; box-shadow: 4px 0 16px rgba(0,0,0,0.15);
+  transform: translateX(-100%); transition: transform 0.3s ease;
+  overflow-y: auto; -webkit-overflow-scrolling: touch;
+}
+.node-nav-panel.show { transform: translateX(0); }
+.node-nav-header {
+  padding: 14px 16px; background: var(--c1); color: #fff;
+  font-size: 15px; font-weight: 600; display: flex; justify-content: space-between; align-items: center;
+}
+.node-nav-close { background:none; border:none; color:#fff; font-size:20px; cursor:pointer; padding:0 4px; }
+.node-nav-list { padding: 8px 0; }
+.node-nav-group { margin-bottom: 4px; }
+.node-nav-branch {
+  padding: 10px 16px; font-size: 13px; font-weight: 600; color: var(--c1);
+  cursor: pointer; display: flex; align-items: center; gap: 6px;
+}
+.node-nav-branch:hover { background: var(--c1l); }
+.node-nav-children { padding-left: 24px; }
+.node-nav-child {
+  padding: 7px 16px 7px 12px; font-size: 12px; color: var(--text);
+  cursor: pointer; border-left: 2px solid var(--border);
+}
+.node-nav-child:hover { background: var(--c1l); color: var(--c1); }
+.node-nav-overlay {
+  position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.4);
+  z-index:150; display: none;
+}
+.node-nav-overlay.show { display: block; }
+@media (max-width: 600px) {
+  .node-nav-panel { width: 260px; }
+  .node-nav-branch { font-size: 12px; padding: 8px 14px; }
+  .node-nav-child { font-size: 11px; padding: 6px 14px 6px 10px; }
+}
+
+/* 推导链折叠 */
+.logic-section h3{cursor:pointer;user-select:none;display:flex;justify-content:space-between;align-items:center;}
+.lg-arrow{font-size:12px;transition:transform .3s;color:var(--text2,#6b7280);flex-shrink:0;margin-left:8px;}
+.logic-section.collapsed > *:not(h3){display:none !important;}
+.logic-section.collapsed h3{border-bottom:none !important;padding-bottom:0 !important;margin-bottom:0 !important;}
+.logic-section.collapsed .lg-arrow{transform:rotate(-90deg);}
+</style>
+</head>
+<body>
+
+<div class=&quot;topbar&quot;>
+  <button class=&quot;topbar-btn&quot; onclick=&quot;window.location.href='第二章 - 智能体.html'&quot; style=&quot;margin-right:6px;font-weight:600;&quot;>← 返回</button>
+  <div class=&quot;topbar-title&quot;>第二章-智能体 · 思维导图</div>
+  <button class=&quot;topbar-btn&quot; id=&quot;expandAll&quot;>全部展开</button>
+  <button class=&quot;topbar-btn&quot; id=&quot;collapseAll&quot;>全部折叠</button>
+  <button class=&quot;topbar-btn&quot; id=&quot;themeToggle&quot;>🌙</button>
+</div>
+
+<div class=&quot;main&quot;>
+
+  <!-- 节点详情面板 -->
+  <div class=&quot;info-panel&quot; id=&quot;infoPanel&quot;>
+    <button class=&quot;close-btn&quot; onclick=&quot;closeInfo()&quot;>×</button>
+    <h3 id=&quot;infoTitle&quot;></h3>
+    <div id=&quot;infoContent&quot;></div>
+  </div>
+
+  <div class=&quot;mindmap-container&quot;>
+    <div class=&quot;mindmap&quot;>
+
+      <!-- 中心节点 -->
+      <div class=&quot;center-node&quot;>
+        <div class=&quot;node&quot; onclick=&quot;showInfo('center')&quot;>
+          第二章 智能体
+          <div class=&quot;sub&quot;>Intelligent Agents · 数理逻辑结构</div>
+        </div>
+      </div>
+
+      <div class=&quot;relation-hint&quot;>
+        <span class=&quot;arrow-down&quot;>▼</span><br>
+        四大支柱 · 定义 → 标准 → 环境 → 结构
+      </div>
+
+      <!-- 四大分支 -->
+      <div class=&quot;branch-row&quot;>
+
+        <!-- 分支1：定义层 -->
+        <div class=&quot;branch-group&quot; data-color=&quot;1&quot; id=&quot;branch1&quot;>
+          <div class=&quot;branch-header&quot; onclick=&quot;toggleBranch(this.parentElement)&quot;>
+            <div class=&quot;icon&quot;>定</div>
+            <div class=&quot;title&quot;>定义层 · Agent是什么</div>
+            <div class=&quot;toggle&quot;>▼</div>
+          </div>
+          <div class=&quot;branch-children&quot;>
+            <div class=&quot;child-node&quot; onclick=&quot;toggleChild(this);showInfo('agent')&quot;>
+              <span class=&quot;arrow&quot;>▶</span>
+              <span class=&quot;node-title&quot;>Agent = 感知 + 行动</span>
+              <div class=&quot;node-desc&quot;>通过传感器感知环境，通过执行器作用于环境的实体。公式：Agent = 体系结构(硬件) + Agent程序(软件)</div>
+            </div>
+            <div class=&quot;child-node&quot; onclick=&quot;toggleChild(this);showInfo('sensors')&quot;>
+              <span class=&quot;arrow&quot;>▶</span>
+              <span class=&quot;node-title&quot;>传感器 Sensors</span>
+              <div class=&quot;node-desc&quot;>Agent的&quot;输入器官&quot;，接收环境信息。如摄像头、雷达、键盘。</div>
+            </div>
+            <div class=&quot;child-node&quot; onclick=&quot;toggleChild(this);showInfo('actuators')&quot;>
+              <span class=&quot;arrow&quot;>▶</span>
+              <span class=&quot;node-title&quot;>执行器 Actuators</span>
+              <div class=&quot;node-desc&quot;>Agent的&quot;输出器官&quot;，对环境施加影响。如机械臂、轮子、显示屏。</div>
+            </div>
+            <div class=&quot;child-node&quot; onclick=&quot;toggleChild(this);showInfo('percept')&quot;>
+              <span class=&quot;arrow&quot;>▶</span>
+              <span class=&quot;node-title&quot;>感知序列 Percept Sequence</span>
+              <div class=&quot;node-desc&quot;>从开始到当前的全部感知历史。是Agent决策的全部信息依据。</div>
+            </div>
+            <div class=&quot;child-node&quot; onclick=&quot;toggleChild(this);showInfo('func')&quot;>
+              <span class=&quot;arrow&quot;>▶</span>
+              <span class=&quot;node-title&quot;>Agent函数 vs Agent程序</span>
+              <div class=&quot;node-desc&quot;>函数=抽象数学映射(感知序列→行动)；程序=代码实现(输入当前感知)。一个函数可由多个程序实现。</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 分支2：标准层 -->
+        <div class=&quot;branch-group&quot; data-color=&quot;2&quot; id=&quot;branch2&quot;>
+          <div class=&quot;branch-header&quot; onclick=&quot;toggleBranch(this.parentElement)&quot;>
+            <div class=&quot;icon&quot;>标</div>
+            <div class=&quot;title&quot;>标准层 · 什么是好的Agent</div>
+            <div class=&quot;toggle&quot;>▼</div>
+          </div>
+          <div class=&quot;branch-children&quot;>
+            <div class=&quot;child-node&quot; onclick=&quot;toggleChild(this);showInfo('rational')&quot;>
+              <span class=&quot;arrow&quot;>▶</span>
+              <span class=&quot;node-title&quot;>理性Agent = 期望最大化</span>
+              <div class=&quot;node-desc&quot;>基于感知证据和先验知识，选择最大化性能度量期望值的行动。a* = arg max_a E[Performance|evidence]</div>
+            </div>
+            <div class=&quot;child-node&quot; onclick=&quot;toggleChild(this);showInfo('four')&quot;>
+              <span class=&quot;arrow&quot;>▶</span>
+              <span class=&quot;node-title&quot;>理性四要素</span>
+              <div class=&quot;node-desc&quot;>①性能度量 ②环境先验知识 ③可执行行动 ④感知序列。四者共同决定行动是否理性。</div>
+            </div>
+            <div class=&quot;child-node&quot; onclick=&quot;toggleChild(this);showInfo('compare')&quot;>
+              <span class=&quot;arrow&quot;>▶</span>
+              <span class=&quot;node-title&quot;>理性 ≠ 全知 ≠ 完美</span>
+              <div class=&quot;node-desc&quot;>理性=决策过程最优(可实现)；全知=预知未来(不可能)；完美=实际结果最优(靠运气)。</div>
+            </div>
+            <div class=&quot;child-node&quot; onclick=&quot;toggleChild(this);showInfo('learn')&quot;>
+              <span class=&quot;arrow&quot;>▶</span>
+              <span class=&quot;node-title&quot;>信息收集 → 学习 → 自主性</span>
+              <div class=&quot;node-desc&quot;>理性Agent主动收集信息减少不确定性→通过学习更新知识→获得自主性(不依赖预设规则)。</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class=&quot;branch-row&quot;>
+
+        <!-- 分支3：环境层 -->
+        <div class=&quot;branch-group&quot; data-color=&quot;3&quot; id=&quot;branch3&quot;>
+          <div class=&quot;branch-header&quot; onclick=&quot;toggleBranch(this.parentElement)&quot;>
+            <div class=&quot;icon&quot;>环</div>
+            <div class=&quot;title&quot;>环境层 · Agent在什么环境运行</div>
+            <div class=&quot;toggle&quot;>▼</div>
+          </div>
+          <div class=&quot;branch-children&quot;>
+            <div class=&quot;child-node&quot; onclick=&quot;toggleChild(this);showInfo('peas')&quot;>
+              <span class=&quot;arrow&quot;>▶</span>
+              <span class=&quot;node-title&quot;>PEAS框架</span>
+              <div class=&quot;node-desc&quot;>P性能度量 + E环境 + A执行器 + S传感器。设计Agent第一步，四要素完整描述任务环境。</div>
+            </div>
+            <div class=&quot;child-node&quot; onclick=&quot;toggleChild(this);showInfo('seven')&quot;>
+              <span class=&quot;arrow&quot;>▶</span>
+              <span class=&quot;node-title&quot;>7大属性维度（独立可组合）</span>
+              <div class=&quot;node-desc&quot;>①可观察性 ②确定性 ③片段/序贯 ④静态/动态 ⑤离散/连续 ⑥单/多Agent ⑦已知/未知。每个维度独立，可任意组合。</div>
+            </div>
+            <div class=&quot;child-node&quot; onclick=&quot;toggleChild(this);showInfo('hardest')&quot;>
+              <span class=&quot;arrow&quot;>▶</span>
+              <span class=&quot;node-title&quot;>最难环境组合</span>
+              <div class=&quot;node-desc&quot;>部分可观察 + 多Agent + 随机 + 序贯 + 动态 + 连续 + 未知。自动驾驶是典型代表。</div>
+            </div>
+            <div class=&quot;child-node&quot; onclick=&quot;toggleChild(this);showInfo('keymix')&quot;>
+              <span class=&quot;arrow&quot;>▶</span>
+              <span class=&quot;node-title&quot;>关键组合辨析</span>
+              <div class=&quot;node-desc&quot;>象棋=完全可观察+确定+多Agent；扑克=部分可观察+确定(底层)→教材标随机；双陆棋=完全可观察+随机。</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 分支4：结构层 -->
+        <div class=&quot;branch-group&quot; data-color=&quot;4&quot; id=&quot;branch4&quot;>
+          <div class=&quot;branch-header&quot; onclick=&quot;toggleBranch(this.parentElement)&quot;>
+            <div class=&quot;icon&quot;>构</div>
+            <div class=&quot;title&quot;>结构层 · Agent怎么实现</div>
+            <div class=&quot;toggle&quot;>▼</div>
+          </div>
+          <div class=&quot;branch-children&quot;>
+            <div class=&quot;child-node&quot; onclick=&quot;toggleChild(this);showInfo('upgrade')&quot;>
+              <span class=&quot;arrow&quot;>▶</span>
+              <span class=&quot;node-title&quot;>四种Agent升级链</span>
+              <div class=&quot;node-desc&quot;>简单反射 → 基于模型 → 基于目标 → 基于效用。每代多一个零件：记忆→目标→效用，能力递增。</div>
+            </div>
+            <div class=&quot;child-node&quot; onclick=&quot;toggleChild(this);showInfo('simple')&quot;>
+              <span class=&quot;arrow&quot;>▶</span>
+              <span class=&quot;node-title&quot;>① 简单反射Agent</span>
+              <div class=&quot;node-desc&quot;>仅看当前感知+if-then规则，无记忆。最简单，只能处理完全可观察环境。</div>
+            </div>
+            <div class=&quot;child-node&quot; onclick=&quot;toggleChild(this);showInfo('model')&quot;>
+              <span class=&quot;arrow&quot;>▶</span>
+              <span class=&quot;node-title&quot;>② 基于模型的Agent</span>
+              <div class=&quot;node-desc&quot;>维护内部世界模型(转移模型+传感器模型)，能推断看不到的状态。可处理部分可观察环境。</div>
+            </div>
+            <div class=&quot;child-node&quot; onclick=&quot;toggleChild(this);showInfo('goal')&quot;>
+              <span class=&quot;arrow&quot;>▶</span>
+              <span class=&quot;node-title&quot;>③ 基于目标的Agent</span>
+              <div class=&quot;node-desc&quot;>知道目标，通过搜索规划行动序列达成目标。更灵活，目标改变即可适应新任务。</div>
+            </div>
+            <div class=&quot;child-node&quot; onclick=&quot;toggleChild(this);showInfo('utility')&quot;>
+              <span class=&quot;arrow&quot;>▶</span>
+              <span class=&quot;node-title&quot;>④ 基于效用的Agent</span>
+              <div class=&quot;node-desc&quot;>用效用函数U(s)给状态打分，选期望效用最大的行动。可在多目标间权衡，处理不确定性。</div>
+            </div>
+            <div class=&quot;child-node&quot; onclick=&quot;toggleChild(this);showInfo('learning')&quot;>
+              <span class=&quot;arrow&quot;>▶</span>
+              <span class=&quot;node-title&quot;>学习Agent（四组件）</span>
+              <div class=&quot;node-desc&quot;>性能元件(干活)+学习元件(改进)+评判元件(打分)+问题产生器(探索)。从经验中持续改进，获得自主性。</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 数理逻辑关系区 -->
+  <div class=&quot;logic-section collapsed&quot;><h3 onclick=&quot;this.parentElement.classList.toggle('collapsed')&quot;>📐 数理逻辑推导链<span class=&quot;lg-arrow&quot;>▼</span></h3>
+
+    <div class=&quot;logic-chain&quot;>
+      <span class=&quot;step&quot;>感知序列</span>
+      <span class=&quot;arrow&quot;>→</span>
+      <span class=&quot;step&quot;>Agent函数 f:P*→A</span>
+      <span class=&quot;arrow&quot;>→</span>
+      <span class=&quot;step&quot;>Agent程序实现</span>
+      <span class=&quot;arrow&quot;>→</span>
+      <span class=&quot;result&quot;>行动输出</span>
+    </div>
+
+    <div class=&quot;logic-chain&quot;>
+      <span class=&quot;step&quot;>性能度量+先验知识+行动集+感知序列</span>
+      <span class=&quot;arrow&quot;>⇒</span>
+      <span class=&quot;step&quot;>理性行动 a*=argmax E[Perf|evid]</span>
+      <span class=&quot;arrow&quot;>≠</span>
+      <span class=&quot;step&quot;>全知(预知未来)</span>
+      <span class=&quot;arrow&quot;>≠</span>
+      <span class=&quot;result&quot;>完美(实际最优)</span>
+    </div>
+
+    <div class=&quot;logic-chain&quot;>
+      <span class=&quot;step&quot;>简单反射(无记忆)</span>
+      <span class=&quot;arrow&quot;>+内部模型→</span>
+      <span class=&quot;step&quot;>基于模型</span>
+      <span class=&quot;arrow&quot;>+目标→</span>
+      <span class=&quot;step&quot;>基于目标</span>
+      <span class=&quot;arrow&quot;>+效用函数→</span>
+      <span class=&quot;step&quot;>基于效用</span>
+      <span class=&quot;arrow&quot;>+学习→</span>
+      <span class=&quot;result&quot;>学习Agent</span>
+    </div>
+
+    <div class=&quot;logic-chain&quot;>
+      <span class=&quot;step&quot;>部分可观察+多Agent+随机+序贯+动态+连续+未知</span>
+      <span class=&quot;arrow&quot;>⇒</span>
+      <span class=&quot;result&quot;>最难任务环境（自动驾驶）</span>
+    </div>
+  </div>
+
+  <!-- 图例 -->
+  <div class=&quot;legend&quot;>
+    <div class=&quot;legend-item&quot;><div class=&quot;legend-dot&quot; style=&quot;background:var(--c1)&quot;></div>定义层</div>
+    <div class=&quot;legend-item&quot;><div class=&quot;legend-dot&quot; style=&quot;background:var(--c2)&quot;></div>标准层</div>
+    <div class=&quot;legend-item&quot;><div class=&quot;legend-dot&quot; style=&quot;background:var(--c3)&quot;></div>环境层</div>
+    <div class=&quot;legend-item&quot;><div class=&quot;legend-dot&quot; style=&quot;background:var(--c4)&quot;></div>结构层</div>
+    <div class=&quot;legend-item&quot;>💡 点击节点查看详情 · 点击分支标题展开/折叠</div>
+  </div>
+
+</div>
+
+<script>
+// 节点详情数据
+var nodeInfo = {
+  center: {
+    title: '第二章 智能体 · 整体结构',
+    content: '<p>本章围绕&quot;智能体&quot;核心概念，按<strong>数理逻辑四层结构</strong>展开：</p>' +
+      '<p><strong>定义层</strong>：Agent是什么？（感知+行动，函数vs程序）</p>' +
+      '<p><strong>标准层</strong>：什么是好的Agent？（理性=期望最大化，四要素）</p>' +
+      '<p><strong>环境层</strong>：Agent在什么环境运行？（PEAS，7大属性维度）</p>' +
+      '<p><strong>结构层</strong>：Agent怎么实现？（四种升级链，学习Agent）</p>' +
+      '<p>四层之间是<strong>递进关系</strong>：先定义对象→再定评价标准→再分析运行环境→最后设计实现结构。</p>'
+  },
+  agent: {
+    title: 'Agent定义',
+    content: '<p><strong>定义</strong>：任何能够通过传感器感知环境，并通过执行器作用于该环境的事物。</p>' +
+      '<div class=&quot;formula&quot;>Agent = 体系结构(硬件) + Agent程序(软件)</div>' +
+      '<p><strong>核心循环</strong>：感知环境 → 处理决策 → 执行行动 → 改变环境 → 再次感知...</p>' +
+      '<p><strong>理解</strong>：Agent不是物体自带属性，而是我们用来分析系统的建模视角。袖珍计算器也可以看作Agent，但没有分析意义。</p>'
+  },
+  rational: {
+    title: '理性Agent定义',
+    content: '<p><strong>定义</strong>：对每一个可能的感知序列，根据已知感知证据和先验知识，选择能使性能度量的期望值最大化的行动。</p>' +
+      '<div class=&quot;formula&quot;>a* = arg max_a E[Performance | evidence]</div>' +
+      '<p><strong>关键点</strong>：</p>' +
+      '<p>1. 理性是<strong>期望</strong>最优，不是保证结果最优</p>' +
+      '<p>2. 理性只对<strong>当下掌握的信息</strong>负责，不需要预知意外</p>' +
+      '<p>3. 例子：根据路况安全过马路，被天上掉物砸中——决定仍是理性的</p>'
+  },
+  peas: {
+    title: 'PEAS框架',
+    content: '<p><strong>定义</strong>：描述任务环境的四要素框架，是设计Agent前的第一步。</p>' +
+      '<div class=&quot;formula&quot;>PEAS = Performance + Environment + Actuators + Sensors</div>' +
+      '<p><strong>四要素</strong>：</p>' +
+      '<p>• <strong>P 性能度量</strong>：怎样算成功？（应基于结果，非过程）</p>' +
+      '<p>• <strong>E 环境</strong>：在什么世界里运行？</p>' +
+      '<p>• <strong>A 执行器</strong>：能做什么动作？</p>' +
+      '<p>• <strong>S 传感器</strong>：能感知什么？</p>' +
+      '<p><strong>例子</strong>：自动驾驶——P安全/快速/合法，E道路/车辆/行人，A方向盘/油门/刹车，S摄像头/雷达/GPS</p>'
+  },
+  upgrade: {
+    title: '四种Agent升级链',
+    content: '<p><strong>升级逻辑</strong>：每一代在前一代基础上&quot;多加一个零件&quot;，能力递增。</p>' +
+      '<div class=&quot;formula&quot;>简单反射 →(+内部模型)→ 基于模型 →(+目标)→ 基于目标 →(+效用函数)→ 基于效用</div>' +
+      '<p><strong>各代解决的问题</strong>：</p>' +
+      '<p>• 简单反射：最简单规则响应，但只能处理完全可观察环境</p>' +
+      '<p>• 基于模型：+记忆，能处理部分可观察（看不到但能推）</p>' +
+      '<p>• 基于目标：+目标信息，会规划路线达成目标</p>' +
+      '<p>• 基于效用：+效用函数，多目标间权衡，选最优方案</p>' +
+      '<p><strong>理解</strong>：就像手机升级——打电话→能上网→有GPS→AI助手，每代多一个核心能力。</p>'
+  },
+  learning: {
+    title: '学习Agent四组件',
+    content: '<p><strong>定义</strong>：能从经验中持续改进自身行为的Agent。</p>' +
+      '<p><strong>四组件协作流程</strong>：</p>' +
+      '<p>1. <strong>性能元件</strong>：接收感知，选择行动（=原来的Agent本身）</p>' +
+      '<p>2. <strong>评判元件</strong>：按性能标准评价表现，给反馈</p>' +
+      '<p>3. <strong>学习元件</strong>：根据反馈修改性能元件，改进行为</p>' +
+      '<p>4. <strong>问题产生器</strong>：提议探索性行动，获取新经验</p>' +
+      '<div class=&quot;formula&quot;>性能元件干活 → 评判元件打分 → 学习元件改进 → 问题产生器探索 → 循环</div>' +
+      '<p><strong>意义</strong>：学习能力是获得<strong>自主性</strong>的关键——不依赖设计者预设规则，自己从环境中学习适应。</p>'
+  }
+};
+
+// 通用详情（未单独定义的节点）
+var genericInfo = {
+  sensors: { title:'传感器 Sensors', content:'<p>Agent的&quot;输入器官&quot;，用来感知环境的装置。</p><p>例子：摄像头、雷达、麦克风、键盘、温度传感器等。</p><p><strong>关系</strong>：传感器能力决定了环境是&quot;完全可观察&quot;还是&quot;部分可观察&quot;。</p>' },
+  actuators: { title:'执行器 Actuators', content:'<p>Agent的&quot;输出器官&quot;，用来对环境施加影响的装置。</p><p>例子：机械臂、轮子、显示屏、语音输出、电机等。</p><p><strong>关系</strong>：执行器决定了Agent的&quot;行动空间&quot;，即它能做什么。</p>' },
+  percept: { title:'感知序列 Percept Sequence', content:'<p>Agent从开始运行到当前时刻所接收到的全部感知的完整历史。</p><p><strong>重要性</strong>：是Agent决策的全部信息依据。Agent函数的输入就是感知序列。</p><p><strong>注意</strong>：Agent程序的输入只有&quot;当前感知&quot;，如果需要历史信息，程序必须自己内部存储。</p>' },
+  func: { title:'Agent函数 vs Agent程序', content:'<p><strong>Agent函数</strong>：抽象数学映射 f: P* → A，将感知序列映射为行动。理论上是张大表，通常无穷大不可实现。</p><p><strong>Agent程序</strong>：Agent函数在物理硬件上的代码实现。输入是&quot;当前感知&quot;，不是全部历史。</p><p><strong>关系</strong>：一个Agent函数可以由多个不同的Agent程序实现。函数是&quot;应该怎么做&quot;的理论描述，程序是&quot;实际怎么做&quot;的代码。</p>' },
+  four: { title:'理性四要素', content:'<p>判断一个行动是否理性，必须同时考虑四点：</p><p>1. <strong>性能度量</strong>：评判成功的标准（目标）</p><p>2. <strong>环境先验知识</strong>：Agent预先知道的环境信息</p><p>3. <strong>可执行行动</strong>：Agent能够采取的行为集合</p><p>4. <strong>感知序列</strong>：到当前为止的全部感知历史</p><p><strong>理解</strong>：同样的行动，在不同性能度量/环境/知识/感知下，理性判断可能不同。理性是依赖上下文的。</p>' },
+  compare: { title:'理性 ≠ 全知 ≠ 完美', content:'<p><strong>理性(Rational)</strong>：基于可用信息，做期望最优的决策。可实现，不保证结果好。</p><p><strong>全知(Omniscient)</strong>：预知行动的真实实际结果。理想化概念，现实不可能存在。</p><p><strong>完美(Perfect)</strong>：实际性能最大化。事后看结果最优，通常靠运气。</p><p><strong>关键区别</strong>：理性评判的是&quot;决策过程&quot;，完美评判的是&quot;实际结果&quot;。理性Agent可能因为信息不足而失败，但其决策过程仍是理性的。</p>' },
+  learn: { title:'信息收集 → 学习 → 自主性', content:'<p><strong>信息收集</strong>：理性Agent为减少不确定性，会主动采取行动获取更多环境信息。如过马路前先左右看。</p><p><strong>学习</strong>：Agent通过感知经验不断更新知识、改进行为。使Agent能从初始先验知识出发，逐渐适应未知环境。</p><p><strong>自主性</strong>：Agent的行为由自身从环境中学到的知识决定，而非完全依赖预设规则。</p><div class=&quot;formula&quot;>信息收集(减少不确定性) → 学习(更新知识) → 自主性(不依赖预设)</div>' },
+  seven: { title:'7大属性维度', content:'<p>任务环境可从7个独立维度分类，每个维度互不绑定，可任意组合：</p><p>1. <strong>可观察性</strong>：完全可观察 vs 部分可观察</p><p>2. <strong>确定性</strong>：确定性 vs 随机性</p><p>3. <strong>片段性</strong>：片段式 vs 序贯式</p><p>4. <strong>动态性</strong>：静态 vs 动态（含半动态）</p><p>5. <strong>离散性</strong>：离散 vs 连续</p><p>6. <strong>Agent数量</strong>：单Agent vs 多Agent</p><p>7. <strong>知识完整性</strong>：已知 vs 未知（这是Agent的知识状态，不是环境固有属性！）</p>' },
+  hardest: { title:'最难环境组合', content:'<p><strong>最难处理的环境</strong>：部分可观察 + 多Agent + 随机 + 序贯式 + 动态 + 连续 + 未知</p><p><strong>典型代表</strong>：自动驾驶出租车</p><p><strong>为什么最难</strong>：</p><p>• 部分可观察：看不到被遮挡的车辆/行人</p><p>• 多Agent：其他车辆/行人都是自主决策的Agent</p><p>• 随机：其他司机行为不可预测</p><p>• 序贯：一个变道影响之后所有决策</p><p>• 动态：环境一直在变，犹豫就错过时机</p><p>• 连续：速度/角度是连续值</p><p>• 未知：可能遇到从未见过的路况</p>' },
+  keymix: { title:'关键组合辨析', content:'<p><strong>国际象棋</strong>：完全可观察 + 确定性 + 多Agent。对手的选择是Agent决策，不是环境随机。</p><p><strong>扑克</strong>：部分可观察 + 底层确定，但教材从Agent视角标为随机(Stochastic)。因为隐藏信息导致Agent无法唯一预测后续局面。</p><p><strong>西洋双陆棋</strong>：完全可观察 + 真随机。掷骰子是环境本身产生的随机事件，所有人不动也随机。</p><p><strong>关键区分</strong>：多Agent不确定性 ≠ 环境随机。确定性看的是&quot;所有Agent动作确定后，环境下一状态是否唯一&quot;。</p>' },
+  simple: { title:'① 简单反射Agent', content:'<p><strong>定义</strong>：仅根据当前感知选择行动，基于条件-动作规则(if-then)，不维护内部状态，不记录历史。</p><p><strong>工作方式</strong>：感知当前状态 → 查规则表 → 执行对应行动</p><p><strong>优点</strong>：结构最简单、反应快、易于实现</p><p><strong>重大局限（必考）</strong>：只能用于完全可观察环境。部分可观察环境下仅靠当前感知信息不足，很容易失效。</p><p><strong>例子</strong>：两格吸尘器（有灰吸尘，干净移动）；看到红灯就刹车</p>' },
+  model: { title:'② 基于模型的反射Agent', content:'<p><strong>定义</strong>：维护内部状态来追踪环境中不可直接观察的部分，依赖世界模型预测环境如何变化及行动后果。</p><p><strong>核心组件</strong>：</p><p>• <strong>内部状态</strong>：存储环境不可见部分的信息</p><p>• <strong>转移模型</strong>：行动如何改变世界状态</p><p>• <strong>传感器模型</strong>：世界状态如何产生感知</p><p><strong>与简单反射区别</strong>：多了&quot;记忆&quot;——能推断&quot;看不到但能推出来的东西&quot;。</p><p><strong>例子</strong>：自动驾驶汽车维护对其他车辆位置的内部估计，即使被遮挡</p>' },
+  goal: { title:'③ 基于目标的Agent', content:'<p><strong>定义</strong>：在基于模型基础上增加目标信息，能根据目标规划行动序列。</p><p><strong>核心机制</strong>：知道&quot;想要达到什么状态&quot;，在行动前考虑&quot;这个行动能否让我更接近目标&quot;，通过搜索或规划选择行动序列。</p><p><strong>优点</strong>：更灵活，目标改变即可适应新任务，不需要重写规则。</p><p><strong>局限</strong>：不区分目标优先级，无法在多个冲突目标间权衡。</p><p><strong>例子</strong>：GPS导航（目标=到达目的地，搜索最优路线）；迷宫求解机器人</p>' },
+  utility: { title:'④ 基于效用的Agent', content:'<p><strong>定义</strong>：使用效用函数U(s)将状态映射为实数，表示&quot;合意程度&quot;，选择最大化期望效用的行动。</p><p><strong>核心机制</strong>：给每个状态打分，选期望效用最大的行动，而不仅仅是&quot;达到目标&quot;。</p><p><strong>三大优势</strong>：</p><p>1. 多条路都能到目标时，选&quot;更好&quot;的那条</p><p>2. 多个竞争性目标间能权衡（如安全但慢 vs 危险但快）</p><p>3. 能在不确定性环境下做风险决策</p><p><strong>例子</strong>：医疗诊断（治疗效果/副作用/费用间权衡）；自动驾驶（安全/速度/舒适度权衡）</p>' }
+};
+
+// 显示节点详情
+function showInfo(key) {
+  var panel = document.getElementById('infoPanel');
+  var title = document.getElementById('infoTitle');
+  var content = document.getElementById('infoContent');
+  var info = nodeInfo[key] || genericInfo[key];
+  if (info) {
+    title.textContent = info.title;
+    content.innerHTML = info.content;
+    panel.classList.add('show');
+  }
+}
+function closeInfo() {
+  document.getElementById('infoPanel').classList.remove('show');
+}
+
+// 展开/折叠分支
+function toggleBranch(group) {
+  group.classList.toggle('collapsed');
+}
+
+// 展开/折叠子节点
+function toggleChild(node) {
+  node.classList.toggle('expanded');
+}
+
+// 全部展开/折叠
+document.getElementById('expandAll').addEventListener('click', function() {
+  document.querySelectorAll('.branch-group').forEach(function(g){g.classList.remove('collapsed');});
+  document.querySelectorAll('.child-node').forEach(function(n){n.classList.add('expanded');});
+});
+document.getElementById('collapseAll').addEventListener('click', function() {
+  document.querySelectorAll('.branch-group').forEach(function(g){g.classList.add('collapsed');});
+  document.querySelectorAll('.child-node').forEach(function(n){n.classList.remove('expanded');});
+  closeInfo();
+});
+
+// 主题切换
+document.getElementById('themeToggle').addEventListener('click', function() {
+  var html = document.documentElement;
+  if (html.getAttribute('data-theme') === 'dark') {
+    html.removeAttribute('data-theme');
+    this.textContent = '🌙';
+  } else {
+    html.setAttribute('data-theme', 'dark');
+    this.textContent = '☀️';
+  }
+});
+
+// 全部展开
+function expandAll() {
+  document.querySelectorAll('.branch-group').forEach(function(g) { g.classList.add('expanded'); });
+  document.querySelectorAll('.children').forEach(function(c) { c.style.display = 'block'; });
+  document.querySelectorAll('.child-node').forEach(function(n) { n.classList.add('expanded'); });
+}
+// 全部折叠
+function collapseAll() {
+  document.querySelectorAll('.branch-group').forEach(function(g) { g.classList.remove('expanded'); });
+  document.querySelectorAll('.children').forEach(function(c) { c.style.display = 'none'; });
+  document.querySelectorAll('.child-node').forEach(function(n) { n.classList.remove('expanded'); });
+}
+// 打开节点目录
+function openNodeNav() {
+  document.getElementById('nodeNavPanel').classList.add('show');
+  document.getElementById('nodeNavOverlay').classList.add('show');
+  generateNodeNav();
+}
+function closeNodeNav() {
+  document.getElementById('nodeNavPanel').classList.remove('show');
+  document.getElementById('nodeNavOverlay').classList.remove('show');
+}
+// 生成节点目录
+function generateNodeNav() {
+  var list = document.getElementById('nodeNavList');
+  list.innerHTML = '';
+  // 中心节点
+  var center = document.createElement('div');
+  center.className = 'node-nav-branch';
+  center.innerHTML = '⭐ 第二章 智能体';
+  center.onclick = function() { closeNodeNav(); showInfo('center'); };
+  list.appendChild(center);
+  // 四大分支
+  var branches = document.querySelectorAll('.branch-group');
+  var branchNames = ['定义层', '标准层', '环境层', '结构层'];
+  branches.forEach(function(branch, idx) {
+    var group = document.createElement('div');
+    group.className = 'node-nav-group';
+    var title = document.createElement('div');
+    title.className = 'node-nav-branch';
+    title.innerHTML = (idx === 0 ? '📘 ' : idx === 1 ? '📗 ' : idx === 2 ? '📙 ' : '📕 ') + (branchNames[idx] || '分支' + (idx+1));
+    group.appendChild(title);
+    var children = branch.querySelectorAll('.child-node .node-label, .child-node .node-text');
+    var childContainer = document.createElement('div');
+    childContainer.className = 'node-nav-children';
+    // 从nodeInfo获取节点名称
+    var keys = Object.keys(nodeInfo || {});
+    var branchKeys = keys.filter(function(k) {
+      if (idx === 0) return ['agent','percept','actuator','agent_func','agent_program','architecture'].indexOf(k) >= 0;
+      if (idx === 1) return ['rational','rational_action','four_elements','omniscience','perfect'].indexOf(k) >= 0;
+      if (idx === 2) return ['peas','task_env','observable','deterministic','episodic','static','discrete','single_multi'].indexOf(k) >= 0;
+      if (idx === 3) return ['simple_reflex','model_reflex','goal_based','utility_based','learning_agent','learning_components'].indexOf(k) >= 0;
+      return false;
+    });
+    branchKeys.forEach(function(k) {
+      var info = nodeInfo[k];
+      if (info) {
+        var child = document.createElement('div');
+        child.className = 'node-nav-child';
+        child.textContent = info.title;
+        child.onclick = function() { closeNodeNav(); showInfo(k); };
+        childContainer.appendChild(child);
+      }
+    });
+    group.appendChild(childContainer);
+    list.appendChild(group);
+  });
+}
+</script>
+
+<div class=&quot;node-nav-overlay&quot; id=&quot;nodeNavOverlay&quot; onclick=&quot;closeNodeNav()&quot;></div>
+<div class=&quot;node-nav-panel&quot; id=&quot;nodeNavPanel&quot;>
+  <div class=&quot;node-nav-header&quot;>
+    <span>🧠 思维导图目录</span>
+    <button class=&quot;node-nav-close&quot; onclick=&quot;closeNodeNav()&quot;>×</button>
+  </div>
+  <div class=&quot;node-nav-list&quot; id=&quot;nodeNavList&quot;>
+    <!-- 由JS动态生成 -->
+  </div>
+</div>
+</body>
+</html>
+" title="思维导图"></iframe>
+    </div>
+  </div>
+</div>
+<script>
+var currentTab = 'notes';
+var expanded = false;
+
+function switchTab(tab, btn) {
+  currentTab = tab;
+  expanded = false;
+  document.getElementById('expandBtn').textContent = '📂 展开';
+  document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+  btn.classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+}
+
+function getActiveIframe() {
+  var panel = document.getElementById('panel-' + currentTab);
+  return panel ? panel.querySelector('iframe') : null;
+}
+
+function openNav() {
+  var iframe = getActiveIframe();
+  if (!iframe) return;
+  try {
+    var win = iframe.contentWindow;
+    if (currentTab === 'notes') {
+      if (win.openSidebar) win.openSidebar();
+    } else {
+      if (win.openNodeNav) win.openNodeNav();
+    }
+  } catch(e) { console.error(e); }
+}
+
+function toggleExpand() {
+  var iframe = getActiveIframe();
+  if (!iframe) return;
+  try {
+    var win = iframe.contentWindow;
+    if (!expanded) {
+      if (win.expandAll) win.expandAll();
+      document.getElementById('expandBtn').textContent = '📁 折叠';
+      expanded = true;
+    } else {
+      if (win.collapseAll) win.collapseAll();
+      document.getElementById('expandBtn').textContent = '📂 展开';
+      expanded = false;
+    }
+  } catch(e) { console.error(e); }
+}
+</script>
+</body>
+</html>
