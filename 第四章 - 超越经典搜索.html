@@ -1208,12 +1208,31 @@ function initChart() {
   chart.setOption(buildOption());
   chart.on('click', function(p) {
     var d = p.data;
-    if (d.children &amp;&amp; d.children.length) {
+    var hasChildren = d.children &amp;&amp; d.children.length;
+    if (hasChildren) {
       d.collapsed = !d.collapsed;
       refresh();
     }
-    if (d.key) showInfo(d.key);
+    if (d.key) {
+      if (hasChildren) { setTimeout(function(){ showInfo(d.key); }, 60); }
+      else { showInfo(d.key); }
+    }
   });
+  var _lastTouchKey = null;
+  chart.on('mouseover', function(p) { if(p.data &amp;&amp; p.data.key) _lastTouchKey = p.data.key; });
+  var chartDom = document.getElementById('chart');
+  var _touchMoved = false;
+  chartDom.addEventListener('touchstart', function(){ _touchMoved = false; }, {passive:true});
+  chartDom.addEventListener('touchmove', function(){ _touchMoved = true; }, {passive:true});
+  chartDom.addEventListener('touchend', function(e){
+    if (_touchMoved) return;
+    setTimeout(function(){
+      var panel = document.getElementById('infoPanel');
+      if (panel &amp;&amp; !panel.classList.contains('show') &amp;&amp; _lastTouchKey) {
+        showInfo(_lastTouchKey);
+      }
+    }, 120);
+  }, {passive:true});
 }
 function tryInit() {
   if (chartDone) return;
