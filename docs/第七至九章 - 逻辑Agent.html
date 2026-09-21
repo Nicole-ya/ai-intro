@@ -1141,6 +1141,19 @@ function tryInit() {
       chart.on('click', function(p) {
         if (p.data && p.data.key) showInfo(p.data.key);
       });
+      var _lastTouchKey = null;
+      chart.on('mouseover', function(p) { if(p.data && p.data.key) _lastTouchKey = p.data.key; });
+      var _chartDom2 = document.getElementById('chart');
+      var _touchMoved2 = false;
+      _chartDom2.addEventListener('touchstart', function(){ _touchMoved2 = false; }, {passive:true});
+      _chartDom2.addEventListener('touchmove', function(){ _touchMoved2 = true; }, {passive:true});
+      _chartDom2.addEventListener('touchend', function(){
+        if (_touchMoved2) return;
+        setTimeout(function(){
+          var panel = document.getElementById('infoPanel');
+          if (panel && !panel.classList.contains('show') && _lastTouchKey) showInfo(_lastTouchKey);
+        }, 120);
+      }, {passive:true});
       window.addEventListener('resize', function(){ if (chart) chart.resize(); });
     }
   }, 80);

@@ -1001,12 +1001,33 @@ function initChart() {
   chart.setOption(buildOption());
   chart.on('click', function(p) {
     var d = p.data;
-    if (d.children && d.children.length) {
+    var hasChildren = d.children && d.children.length;
+    if (hasChildren) {
       d.collapsed = !d.collapsed;
       refresh();
     }
-    if (d.key) showInfo(d.key);
+    if (d.key) {
+      // 有子节点时先 refresh 再 showInfo，延迟保证重绘完成
+      if (hasChildren) { setTimeout(function(){ showInfo(d.key); }, 60); }
+      else { showInfo(d.key); }
+    }
   });
+  // 手机 touch 降级：ECharts click 在部分移动端不稳定，用 touchend 做备份
+  var _lastTouchKey = null;
+  chart.on('mouseover', function(p) { if(p.data && p.data.key) _lastTouchKey = p.data.key; });
+  var chartDom = document.getElementById('chart');
+  var _touchMoved = false;
+  chartDom.addEventListener('touchstart', function(){ _touchMoved = false; }, {passive:true});
+  chartDom.addEventListener('touchmove', function(){ _touchMoved = true; }, {passive:true});
+  chartDom.addEventListener('touchend', function(e){
+    if (_touchMoved) return;
+    setTimeout(function(){
+      var panel = document.getElementById('infoPanel');
+      if (panel && !panel.classList.contains('show') && _lastTouchKey) {
+        showInfo(_lastTouchKey);
+      }
+    }, 120);
+  }, {passive:true});
 }
 
 function tryInit() {
