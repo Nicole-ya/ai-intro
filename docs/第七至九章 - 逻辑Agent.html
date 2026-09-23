@@ -320,6 +320,13 @@ tr:last-child td { border-bottom: none; }
   background: rgba(0,0,0,0.4); z-index: 80;
 }
 .overlay.show { display: block; }
+
+/* 第四版扩展标签 */
+.v4-badge{display:inline-block;background:#7c3aed;color:#fff;font-size:11px;font-weight:700;
+  padding:1px 7px;border-radius:10px;margin:0 6px;vertical-align:middle;}
+.v4-block{border-left:3px solid #7c3aed;background:#f5f3ff;border-radius:0 8px 8px 0;
+  padding:8px 12px;margin:8px 0;}
+.v4-block-title{font-size:11px;font-weight:700;color:#7c3aed;display:block;margin-bottom:4px;}
 </style>
 </head>
 <body>
@@ -523,7 +530,7 @@ tr:last-child td { border-bottom: none; }
 <h3>4.2 语法基本元素（教材图8.x）</h3>
 <div class=&quot;table-wrap&quot;><table><thead><tr><th>元素</th><th>示例</th><th>指代</th></tr></thead><tbody>
 <tr><td>常量符号</td><td>Hunan, University, John</td><td>对象（个体）</td></tr>
-<tr><td>谓词符号</td><td>Brother, &gt;, Student</td><td>关系（性质是一元关系）</td></tr>
+<tr><td>谓词符号</td><td>Brother, >, Student</td><td>关系（性质是一元关系）</td></tr>
 <tr><td>函词/函数符号</td><td>Sqrt, LeftLegOf</td><td>函数</td></tr>
 <tr><td>变量</td><td>x, y, a, b</td><td>不特指的个体</td></tr>
 <tr><td>连接词</td><td>∧ ∨ ¬ ⇒ ⇔</td><td>同命题逻辑</td></tr>
@@ -773,7 +780,14 @@ T(C)⇒¬T(A)∨¬T(B)；¬T(C)⇒T(A)∧T(B)
 <tr><td>4</td><td><b>谓词 vs 函词</b></td><td>谓词：个体域→{T,F}，代入常量得命题；函词：个体域→个体域，代入常量仍是个体。Mother(x)是函词、Loves(x,y)是谓词。</td></tr>
 <tr><td>5</td><td><b>∀配⇒ vs ∃配∧</b></td><td>∀x P(x)⇒Q(x)（限制论域内才断言Q）；∃x P(x)∧Q(x)（确有一个兼具P和Q）。用反必错：∀配∧ 会把万物拉进P；∃配⇒ 只要有一个非P就为真。</td></tr>
 <tr><td>6</td><td><b>∀x∃y vs ∃y∀x</b></td><td>前者 y 可随 x 变化（“每人都有自己的爱人”）；后者同一个 y 服务所有 x（“存在万人迷”）。混合量词不可交换。</td></tr>
-<tr><td>7</td><td><b>前向链接 vs 反向链接</b></td><td>前向：数据驱动、事实→规则→新事实（监控型）；反向：目标驱动、目标→子目标（问答型，Prolog）。</td></tr>
+<tr><td>7</td><td><b>前向链接 vs 反向链接</b></td><td>前向：数据驱动、事实→规则→新事实（监控型）；反向：目标驱动、目标→子目标（问答型，<div class=&quot;v4-block&quot;><strong>第4版 §9.4 扩充：等式推理与内置公理（Equality and Built-in Axioms）</strong><br>
+第4版明确补充了等式符号 = 的专用推理规则：<br>
+① <strong>等式替换（Substitution of Equals）</strong>：若 t₁ = t₂，可将公式中 t₁ 替换为 t₂<br>
+② <strong>内置谓词</strong>：算术（&amp;lt;、+、×）、集合（∈）可内置公理化<br>
+③ <strong>SLD归结</strong>：Prolog 使用的单一正文字归结 + 深度优先 → 完备但不健全（左递归会死循环）<br>
+第3版对此节较简略，第4版结合实际逻辑编程语言做了具体对比。
+</div>
+Prolog）。</td></tr>
 <tr><td>8</td><td><b>Skolem常量 vs Skolem函数</b></td><td>∃ 前无 ∀ → 常量（∃x R(x) → R(a)）；∃ 前有 n 个 ∀ → 带 n 个参数的函数（∀x∃y R → R(x,f(x))）。参数个数=外层全称变量数。</td></tr>
 </tbody></table></div>
 </div></div>
@@ -781,7 +795,7 @@ T(C)⇒¬T(A)∨¬T(B)；¬T(C)⇒T(A)∧T(B)
 <h3>必背定义（名词解释押题）</h3>
 <ul><li><b>知识库KB</b>：一种形式语言的语句集合；公理=预先给定而非推导的语句；Tell/Ask 是其两个基本操作。</li><li><b>蕴含 α⊨β</b>：使 α 为真的每个模型中 β 也为真，即 M(α)⊆M(β)。</li><li><b>可靠性</b>：KB⊢α ⇒ KB⊨α（推出的都对）；<b>完备性</b>：KB⊨α ⇒ KB⊢α（对的都能推出）。</li><li><b>合一</b>：找置换θ使两原子语句相同；<b>MGU</b>：最一般的合一置换。</li><li><b>归结反演</b>：证KB⊨α ⟺ 证KB∧¬α不可满足，对CNF子句集归结出空子句□。</li></ul>
 <h3>必背公式与规则</h3>
-<ul><li>α⇒β ≡ ¬α∨β；α⇔β ≡ (α⇒β)∧(β⇒α)；¬(α∧β)≡¬α∨¬β；¬(α∨β)≡¬α∧¬β</li><li>¬∀x p ≡ ∃x ¬p；¬∃x p ≡ ∀x ¬p</li><li>连接词优先级：¬ &gt; ∧ &gt; ∨ &gt; ⇒ &gt; ⇔</li><li>P⇒Q 仅当 P真Q假 时为假</li><li>归结：α∨β，¬β∨γ ⊢ α∨γ</li><li>GMP：p₁′…pₙ′ 与 p₁∧…∧pₙ⇒q，若 SUBST(θ,pᵢ′)=SUBST(θ,pᵢ)，则推出 SUBST(θ,q)</li></ul>
+<ul><li>α⇒β ≡ ¬α∨β；α⇔β ≡ (α⇒β)∧(β⇒α)；¬(α∧β)≡¬α∨¬β；¬(α∨β)≡¬α∧¬β</li><li>¬∀x p ≡ ∃x ¬p；¬∃x p ≡ ∀x ¬p</li><li>连接词优先级：¬ > ∧ > ∨ > ⇒ > ⇔</li><li>P⇒Q 仅当 P真Q假 时为假</li><li>归结：α∨β，¬β∨γ ⊢ α∨γ</li><li>GMP：p₁′…pₙ′ 与 p₁∧…∧pₙ⇒q，若 SUBST(θ,pᵢ′)=SUBST(θ,pᵢ)，则推出 SUBST(θ,q)</li></ul>
 <h3>CNF 七步口诀</h3>
 <div class=&quot;formula-box&quot;>消等价 → 消蕴含 → 否内移 → 变量标准化 → Skolem化 → 删全称 → 分配成子句</div>
 <h3>答题模板（15-25分大题）</h3>
@@ -842,7 +856,7 @@ var touchStartX = 0;
 document.addEventListener('touchstart', function(e){ touchStartX = e.touches[0].clientX; }, {passive: true});
 document.addEventListener('touchend', function(e){
   var dx = e.changedTouches[0].clientX - touchStartX;
-  if (touchStartX < 40 && dx > 70) { openSidebar(); }
+  if (touchStartX < 40 &amp;&amp; dx > 70) { openSidebar(); }
   else if (dx < -70) { closeSidebar(); }
 }, {passive: true});
 if (window.innerWidth <= 768) {

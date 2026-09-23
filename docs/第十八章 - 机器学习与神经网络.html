@@ -280,6 +280,13 @@ tr:last-child td { border-bottom: none; }
   .exam-q .q-answer { font-size: 13px; line-height: 1.7; }
   #back-top { bottom: calc(24px + env(safe-area-inset-bottom, 0)); right: 16px; width: 46px; height: 46px; }
 }
+
+/* 第四版扩展标签 */
+.v4-badge{display:inline-block;background:#7c3aed;color:#fff;font-size:11px;font-weight:700;
+  padding:1px 7px;border-radius:10px;margin:0 6px;vertical-align:middle;}
+.v4-block{border-left:3px solid #7c3aed;background:#f5f3ff;border-radius:0 8px 8px 0;
+  padding:8px 12px;margin:8px 0;}
+.v4-block-title{font-size:11px;font-weight:700;color:#7c3aed;display:block;margin-bottom:4px;}
 </style>
 </head>
 <body>
@@ -309,8 +316,8 @@ tr:last-child td { border-bottom: none; }
 <div class=&quot;main&quot;>
 <div class=&quot;cover&quot;>
   <h1>第十八章 机器学习与神经网络</h1>
-  <div class=&quot;subtitle&quot;>Machine Learning &amp; Neural Networks · 教材第18章 + 深度学习</div>
-  <div class=&quot;meta&quot;>《人工智能：一种现代的方法》第3版 · 考点全覆盖 · 历年真题详解<br>⚠️ 2024期末本章两大题共40分，权重全卷最高</div>
+  <div class=&quot;subtitle&quot;>Machine Learning &amp; Neural Networks · 教材第18章 + 深度学习（第3版）</div>
+  <div class=&quot;meta&quot;>《人工智能：一种现代的方法》第4版 · 考点全覆盖 · 历年真题详解<br>⚠️ 2024期末本章两大题共40分，权重全卷最高</div>
 </div>
 
 <div class=&quot;module-card&quot; id=&quot;section-1&quot;>
@@ -448,7 +455,7 @@ K折交叉验证：把数据集均分为K份，轮流以1份为测试集、K-1�
       <p>利用朴素贝叶斯算法计算（Environment=Land, Mammal=Yes）的类别。（共9个训练样本：3个正类、6个负类）</p>
       <div class=&quot;q-answer&quot;>P(+|L,Y) ∝ P(L|+)·P(Y|+)·P(+) = 1 × 1 × 3/9 = 0.33
 P(−|L,Y) ∝ P(L|−)·P(Y|−)·P(−) = 0.5 × 2/3 × 6/9 = 0.22
-因为 0.33 &gt; 0.22，所以该样本类别判为 +（正类）。</div>
+因为 0.33 > 0.22，所以该样本类别判为 +（正类）。</div>
     </div>
     <div class=&quot;exam-q&quot;><div class=&quot;q-title&quot;>[2021C期末 · 贝叶斯分类]（10分）</div>
       <p>给定8个训练样本（属性：light、small、hard 等），用朴素贝叶斯判断新样本（light, small, hard）的类别。</p>
@@ -461,6 +468,35 @@ P(−|L,Y) ∝ P(L|−)·P(Y|−)·P(−) = 0.5 × 2/3 × 6/9 = 0.22
       <tr><td>KNN</td><td>监督·分类/回归</td><td>物以类聚，最近K个邻居投票</td><td>无需训练、思想直观</td><td>预测慢、对K和距离敏感</td></tr>
       <tr><td>朴素贝叶斯</td><td>监督·分类（生成模型）</td><td>贝叶斯定理+条件独立假设</td><td>小数据也有效、训练快</td><td>条件独立假设常不成立</td></tr>
     </table></div>
+
+    <h3>3.5 集成学习（Ensemble Learning）（第4版 18.X）<span class=&quot;v4-badge&quot;>第4版扩展</span></h3>
+    <div class=&quot;tip-box&quot;>
+      <p>集成学习通过组合多个学习器来获得更强的泛化能力，是第4版重点强调的进阶方法。</p>
+    </div>
+    <div class=&quot;table-wrap&quot;>
+      <table>
+        <thead>
+          <tr><th>方法</th><th>训练方式</th><th>核心思想</th><th>降低</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Bagging</strong><br>（Bootstrap Aggregating）</td>
+            <td>并行</td>
+            <td>对原始数据集<strong>有放回采样</strong>，训练多个独立模型，最终<strong>多数投票</strong>（分类）或<strong>平均</strong>（回归）</td>
+            <td>方差（Variance）</td>
+          </tr>
+          <tr>
+            <td><strong>Boosting / AdaBoost</strong></td>
+            <td>串行</td>
+            <td>依次训练弱学习器；对<strong>前一轮分错的样本加大权重</strong>，迫使后续学习器专注于难例；最终<strong>加权投票</strong></td>
+            <td>偏差（Bias）</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class=&quot;tip-box&quot;>
+      💡 <strong>对比记忆</strong>：Bagging = <em>并行</em>、降方差、样本有放回采样（代表：随机森林）；Boosting = <em>串行</em>、降偏差、错样本加权（代表：AdaBoost、XGBoost）。
+    </div>
   </div>
 </div>
 
@@ -524,7 +560,7 @@ P(−|L,Y) ∝ P(L|−)·P(Y|−)·P(−) = 0.5 × 2/3 × 6/9 = 0.22
       <p>给定8条样本的表格（属性：颜色 type、眼睛数目；目标：是否存活 Alive）。<br>
       (1) 计算四个熵值，形如 H(Alive | type=green)；（提示：四个熵值中一个为0、一个为1，另外两个为其他值）<br>
       (2) 计算一个信息增益 IG 值；<br>
-      (3) 计算下列三种划分的信息增益，并说明应选哪个划分：(a) 眼睛数目≤13 / &gt;13；(b) 眼睛数目≤4 / &gt;4；(c) 眼睛数目=11 / ≠11；<br>
+      (3) 计算下列三种划分的信息增益，并说明应选哪个划分：(a) 眼睛数目≤13 / >13；(b) 眼睛数目≤4 / >4；(c) 眼睛数目=11 / ≠11；<br>
       (4) 按上述划分构造决策树，并用构造的树判断两组新数据的类别。</p>
       <div class=&quot;q-answer&quot;>通用解法模板（数据回忆不全，掌握流程即可满分）：
 (1) 对给定属性取值 v，统计子集中存活/死亡的样本数 (p,n)，代入 H = −[p/(p+n)]log₂[p/(p+n)] − [n/(p+n)]log₂[n/(p+n)]。全同类→熵0；各半→熵1。
@@ -634,14 +670,14 @@ Mammal 的信息增益更大 → 选 Mammal 作根结点，再对不纯子集按
     </div>
     <div class=&quot;table-wrap&quot;><table>
       <tr><th>激活函数</th><th>表达式</th><th>输出范围</th><th>特点</th></tr>
-      <tr><td>Step 阶跃函数</td><td>y=1 (X≥0)；y=0 (X&lt;0)</td><td>{0,1}</td><td>感知机常用；不连续、不可导</td></tr>
-      <tr><td>Sign 符号函数</td><td>y=+1 (X≥0)；y=−1 (X&lt;0)</td><td>{−1,+1}</td><td>双极版阶跃</td></tr>
+      <tr><td>Step 阶跃函数</td><td>y=1 (X≥0)；y=0 (X<0)</td><td>{0,1}</td><td>感知机常用；不连续、不可导</td></tr>
+      <tr><td>Sign 符号函数</td><td>y=+1 (X≥0)；y=−1 (X<0)</td><td>{−1,+1}</td><td>双极版阶跃</td></tr>
       <tr><td>Sigmoid 函数</td><td>y = 1/(1+e<sup>−X</sup>)</td><td>(0,1)</td><td>光滑可导，BP算法核心；两端易饱和</td></tr>
       <tr><td>Linear 线性函数</td><td>y = X</td><td>全体实数</td><td>回归输出层常用</td></tr>
     </table></div>
     <h3>5.4 感知机学习算法（四步骤必背）</h3>
     <ol>
-      <li><strong>初始化</strong>：给权值 w₁…wₙ 和阈值 θ 赋较小的随机初值，选定学习率 η（0&lt;η≤1）；</li>
+      <li><strong>初始化</strong>：给权值 w₁…wₙ 和阈值 θ 赋较小的随机初值，选定学习率 η（0<η≤1）；</li>
       <li><strong>前向计算</strong>：输入样本 x，计算 y = f(Σwᵢxᵢ − θ)；</li>
       <li><strong>比较更新</strong>：若 y 与期望输出 d 不一致，按规则调整权值与阈值；</li>
       <li><strong>循环</strong>：重复步骤2-3，直到所有训练样本都分类正确（或达到最大轮数）。</li>
@@ -656,9 +692,9 @@ Mammal 的信息增益更大 → 选 Mammal 作根结点，再对不纯子集按
       <div class=&quot;q-answer&quot;>数学定义：y = f(w₁x₁ + w₂x₂ − θ)，f 为阶跃函数。
 构建：两输入感知机，w₁(0)=0.2，w₂(0)=0.4，θ(0)=0.3，η=0.4。
 学习过程（按样本顺序输入，有错才更新）：
-第1轮：样本(0,0)：net=0−0.3=−0.3&lt;0，y=0=d，不更新；
+第1轮：样本(0,0)：net=0−0.3=−0.3<0，y=0=d，不更新；
 样本(0,1)：net=0.4−0.3=0.1≥0，y=1=d，不更新；
-样本(1,0)：net=0.2−0.3=−0.1&lt;0，y=0≠d=1，e=+1，更新：
+样本(1,0)：net=0.2−0.3=−0.1<0，y=0≠d=1，e=+1，更新：
   w₁(1)=0.2+0.4×1×1=0.6，w₂(1)=0.4+0.4×1×0=0.4，θ(1)=0.3−0.4×1=−0.1；
 样本(1,1)：net=0.6+0.4+0.1=1.1≥0，y=1=d，不更新。
 第2轮：样本(0,0)：net=0+0.1=0.1≥0，y=1≠d=0，e=−1，更新：
@@ -805,6 +841,53 @@ Mammal 的信息增益更大 → 选 Mammal 作根结点，再对不纯子集按
       <li><strong>层次化特征</strong>：浅层学边缘/颜色 → 中层学纹理/形状 → 深层学部件/物体；</li>
       <li><strong>池化带来不变性</strong>：对小的平移、形变鲁棒。</li>
     </ul>
+
+    <h3>6.8 循环神经网络 RNN / LSTM（第4版 18.7 节）<span class=&quot;v4-badge&quot;>第4版扩展</span></h3>
+    <div class=&quot;tip-box&quot;>
+      <p><strong>RNN（Recurrent Neural Network）</strong>：专为序列数据设计，隐状态在时间步间传递：</p>
+      <div class=&quot;formula&quot;>h<sub>t</sub> = f(W<sub>h</sub>·h<sub>t−1</sub> + W<sub>x</sub>·x<sub>t</sub> + b)</div>
+      <ul>
+        <li><strong>梯度消失问题</strong>：在长序列中，梯度随时间步反向传播逐渐趋零，网络难以学习长距离依赖。</li>
+        <li><strong>LSTM（Long Short-Term Memory）</strong>：引入细胞状态与三个门控机制解决梯度消失：
+          <ul>
+            <li>输入门（Input Gate）：控制新信息写入细胞状态的程度；</li>
+            <li>遗忘门（Forget Gate）：控制旧细胞状态的保留程度；</li>
+            <li>输出门（Output Gate）：控制细胞状态输出到隐状态的程度。</li>
+          </ul>
+        </li>
+        <li><strong>应用场景</strong>：时序预测（股价、气象）、自然语言处理（机器翻译、文本生成）、语音识别。</li>
+      </ul>
+      <p style=&quot;margin-top:6px;font-size:12px;color:#888&quot;>来源：Russell &amp; Norvig AIMA 第4版 §18.7</p>
+    </div>
+
+    <h3>6.9 深度学习实用技巧（第4版补充）<span class=&quot;v4-badge&quot;>第4版扩展</span></h3>
+    <div class=&quot;table-wrap&quot;>
+      <table>
+        <thead><tr><th>技巧</th><th>核心思想</th><th>效果</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Dropout</strong></td>
+            <td>训练时随机将部分神经元输出置零（典型比例 0.2–0.5），测试时恢复并按保留率缩放</td>
+            <td>减少神经元共适应，降低过拟合；近似于多个子网络的模型集成</td>
+          </tr>
+          <tr>
+            <td><strong>Batch Normalization</strong></td>
+            <td>对每层输出在 mini-batch 内归一化（零均值、单位方差），再学习可训练的缩放和平移参数</td>
+            <td>加速收敛、允许更大学习率、缓解梯度消失/爆炸，对初始化不敏感</td>
+          </tr>
+          <tr>
+            <td><strong>早停（Early Stopping）</strong></td>
+            <td>监控验证集 loss；若连续若干 epoch 不再下降，则停止训练，恢复验证 loss 最低时的参数</td>
+            <td>防止过拟合，节省训练时间，是最简单有效的正则化手段之一</td>
+          </tr>
+          <tr>
+            <td><strong>学习率调度</strong></td>
+            <td>训练过程中动态降低学习率：阶梯衰减（每 N epoch 乘以衰减系数）、余弦退火（余弦函数降至接近零）等</td>
+            <td>前期快速收敛、后期精细调整，避免在最优解附近震荡</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 
@@ -1005,10 +1088,10 @@ document.addEventListener('touchmove', function(e) {
   if (!isDragging) return;
   touchCurrentX = e.touches[0].clientX;
   var dx = touchCurrentX - touchStartX, dy = e.touches[0].clientY - touchStartY;
-  if (dragDirection === null && Math.abs(dx) > 10) {
+  if (dragDirection === null &amp;&amp; Math.abs(dx) > 10) {
     dragDirection = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v';
   }
-  if (sidebar.classList.contains('open') && dragDirection === 'h' && dx < -20) {
+  if (sidebar.classList.contains('open') &amp;&amp; dragDirection === 'h' &amp;&amp; dx < -20) {
     var tx = Math.max(dx, -sidebar.offsetWidth);
     sidebar.style.transform = 'translateX(' + tx + 'px)';
     sidebar.style.transition = 'none';
@@ -1021,8 +1104,8 @@ document.addEventListener('touchend', function(e) {
   var dx = touchCurrentX - touchStartX;
   sidebar.style.transition = ''; sidebar.style.transform = ''; overlay.style.opacity = '';
   if (dragDirection !== 'h') return;
-  if (sidebar.classList.contains('open') && dx < -60) { closeSidebar(); return; }
-  if (!sidebar.classList.contains('open') && touchStartX < 30 && dx > 60) { openSidebar(); return; }
+  if (sidebar.classList.contains('open') &amp;&amp; dx < -60) { closeSidebar(); return; }
+  if (!sidebar.classList.contains('open') &amp;&amp; touchStartX < 30 &amp;&amp; dx > 60) { openSidebar(); return; }
 }, { passive: true });
 sidebar.addEventListener('touchmove', function(e) { e.stopPropagation(); }, { passive: true });
 </script>
